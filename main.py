@@ -4,91 +4,145 @@ from fastapi.responses import HTMLResponse
 from groq import Groq
 
 app = FastAPI()
-
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
 
 @app.get("/", response_class=HTMLResponse)
 def home():
     return """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>AI Content Generator</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                max-width: 700px;
-                margin: auto;
-                padding: 20px;
-            }
-            input, textarea, select, button {
-                width: 100%;
-                padding: 12px;
-                margin: 8px 0;
-                box-sizing: border-box;
-            }
-            button {
-                cursor: pointer;
-                font-weight: bold;
-            }
-            .result {
-                white-space: pre-wrap;
-                background: #f5f5f5;
-                padding: 15px;
-                margin-top: 20px;
-            }
-        </style>
-    </head>
-    <body>
-        <h1>AI Content Generator</h1>
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Content Generator</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    max-width: 700px;
+    margin: auto;
+    padding: 20px;
+    background: #fafafa;
+}
+h1 { text-align: center; }
+input, textarea, select, button {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0 15px;
+    box-sizing: border-box;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+textarea { min-height: 100px; }
+button {
+    background: #111;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+small { color: #666; }
+</style>
+</head>
 
-        <form method="post" action="/generate">
-            <label>Business / Brand</label>
-            <input name="business" placeholder="Example: Sharma Bakery" required>
+<body>
+<h1>🚀 AI Content Generator</h1>
 
-            <label>Topic / Offer</label>
-            <textarea name="topic" placeholder="Example: Diwali special cake offer" required></textarea>
+<form method="post" action="/generate">
 
-            <label>Content Type</label>
-            <select name="content_type">
-                <option>Instagram Post</option>
-                <option>Facebook Post</option>
-                <option>Product Description</option>
-                <option>Advertisement</option>
-                <option>YouTube Description</option>
-            </select>
+<label>Business / Brand</label>
+<input name="business" placeholder="Example: Sharma Bakery" required>
 
-            <button type="submit">Generate Content</button>
-        </form>
-    </body>
-    </html>
-    """
+<label>Topic / Offer</label>
+<textarea name="topic" placeholder="Example: Diwali special cake offer" required></textarea>
+
+<label>Actual Product Details</label>
+<textarea name="details" placeholder="Example: Chocolate cake, vanilla cake, eggless options, prices..."></textarea>
+<small>AI will use only the details you provide and will avoid inventing products or ingredients.</small>
+
+<label>Content Type</label>
+<select name="content_type">
+<option>Instagram Post</option>
+<option>Facebook Post</option>
+<option>WhatsApp Message</option>
+<option>Product Description</option>
+<option>Advertisement</option>
+<option>YouTube Description</option>
+</select>
+
+<label>Language</label>
+<select name="language">
+<option>English</option>
+<option>Hindi</option>
+<option>Hinglish</option>
+</select>
+
+<label>Tone</label>
+<select name="tone">
+<option>Professional</option>
+<option>Friendly</option>
+<option>Premium</option>
+<option>Fun</option>
+</select>
+
+<button type="submit">✨ Generate Content</button>
+
+</form>
+</body>
+</html>
+"""
+
 
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
+
 @app.post("/generate", response_class=HTMLResponse)
 def generate(
     business: str = Form(...),
     topic: str = Form(...),
-    content_type: str = Form(...)
+    details: str = Form(""),
+    content_type: str = Form(...),
+    language: str = Form(...),
+    tone: str = Form(...)
 ):
-    prompt = f"""
-Create marketing content for this business.
 
-Business: {business}
-Topic/Offer: {topic}
-Content type: {content_type}
+    prompt = f"""
+You are a professional marketing content writer.
+
+Create ready-to-publish marketing content.
+
+Business/Brand:
+{business}
+
+Topic/Offer:
+{topic}
+
+Actual Product Details:
+{details}
+
+Content Type:
+{content_type}
+
+Language:
+{language}
+
+Tone:
+{tone}
+
+IMPORTANT RULES:
+1. Do NOT invent products, ingredients, prices, discounts, delivery promises,
+   dates, features, locations, or business facts.
+2. Only use specific product facts provided by the user.
+3. If important information is missing, keep the wording general instead of
+   making up facts.
+4. Make the content natural and suitable for the selected content type.
 
 Generate:
-1. Catchy title
-2. Main content
-3. Call to action
+1. Catchy Title
+2. Main Content
+3. Call To Action
 4. 8 relevant hashtags
-
-Make it natural and ready to publish.
 """
 
     response = client.chat.completions.create(
@@ -96,7 +150,7 @@ Make it natural and ready to publish.
         messages=[
             {
                 "role": "system",
-                "content": "You are an expert marketing content writer."
+                "content": "You are a careful and professional marketing content writer. Never invent business facts."
             },
             {
                 "role": "user",
@@ -107,20 +161,73 @@ Make it natural and ready to publish.
 
     answer = response.choices[0].message.content
 
+    safe_answer = (
+        answer.replace("&", "&amp;")
+              .replace("<", "&lt;")
+              .replace(">", "&gt;")
+    )
+
     return f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Generated Content</title>
-    </head>
-    <body style="font-family:Arial;max-width:700px;margin:auto;padding:20px;">
-        <h1>Generated Content</h1>
-        <div style="white-space:pre-wrap;background:#f5f5f5;padding:15px;">
-{answer}
-        </div>
-        <br>
-        <a href="/">← Generate another</a>
-    </body>
-    </html>
-    """
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Generated Content</title>
+<style>
+body {{
+    font-family: Arial, sans-serif;
+    max-width: 700px;
+    margin: auto;
+    padding: 20px;
+    background: #fafafa;
+}}
+.result {{
+    white-space: pre-wrap;
+    background: white;
+    padding: 18px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+}}
+button, a {{
+    display: inline-block;
+    padding: 12px 16px;
+    margin-top: 15px;
+    border-radius: 8px;
+    text-decoration: none;
+}}
+button {{
+    background: #111;
+    color: white;
+    border: none;
+}}
+a {{
+    background: #eee;
+    color: #111;
+}}
+</style>
+</head>
+
+<body>
+<h1>✅ Generated Content</h1>
+
+<div class="result" id="content">{safe_answer}</div>
+
+<button onclick="copyContent()">📋 Copy Content</button>
+<a href="/">← Generate Another</a>
+
+<script>
+function copyContent() {{
+    const text = document.getElementById("content").innerText;
+    navigator.clipboard.writeText(text);
+    alert("Content copied!");
+}}
+</script>
+
+</body>
+</html>
+"""
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
