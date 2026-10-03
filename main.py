@@ -119,8 +119,6 @@ def generate(
     prompt = f"""
 You are a factual marketing content writer.
 
-Create ready-to-publish marketing content.
-
 Business:
 {business}
 
@@ -142,30 +140,33 @@ Tone:
 Length:
 {length}
 
-STRICT FACT RULES:
+STRICT RULES:
 - Use ONLY facts explicitly provided by the user.
 - Never invent prices, ingredients, discounts, dates, phone numbers,
   addresses, delivery options, product features, awards, certifications,
   guarantees, or business claims.
-- Do not use unverified claims such as "best", "premium", "fresh",
-  "perfectly sweet", "high quality", "handcrafted", "made with love",
-  "perfect for everyone", or similar claims unless explicitly provided.
-- Do not create fake contact information.
+- Do not claim something is best, premium, fresh, high quality,
+  perfectly sweet, handcrafted, made with love, or similar unless
+  the user explicitly provided that fact.
+- Never create fake contact information.
+- If information is missing, leave it out.
 - Creative wording is allowed only when it does not introduce a new
   factual claim.
-- If information is missing, simply leave it out.
-- Keep the result natural and ready to publish.
 
-Length instructions:
-Short = concise social media copy.
-Normal = balanced social media copy.
-Detailed = longer but still focused copy.
+Create TWO versions:
 
-Generate exactly:
+VERSION 1 — Social Media
 1. Catchy Title
 2. Main Content
 3. Call To Action
 4. 8 relevant hashtags
+
+VERSION 2 — WhatsApp
+Write a short WhatsApp-ready promotional message.
+Use simple formatting and emojis where appropriate.
+Do not add any facts that were not supplied.
+
+Keep both versions natural and ready to copy.
 """
 
     response = client.chat.completions.create(
@@ -258,8 +259,12 @@ a {{
 
 <div class="actions">
 <button onclick="copyContent()">📋 Copy</button>
-<a href="/">🔄 Generate Again</a>
+<button onclick="shareWhatsApp()">💬 WhatsApp</button>
 </div>
+
+<a href="/" style="display:block;margin-top:12px;">
+🔄 Generate Another
+</a>
 
 <div class="message" id="message"></div>
 
@@ -276,6 +281,12 @@ function copyContent() {{
         document.getElementById("message").innerText =
         "Please select and copy the content manually.";
     }});
+}}
+
+function shareWhatsApp() {{
+    const text = document.getElementById("content").innerText;
+    const url = "https://wa.me/?text=" + encodeURIComponent(text);
+    window.open(url, "_blank");
 }}
 </script>
 
