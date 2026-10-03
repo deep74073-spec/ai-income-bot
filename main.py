@@ -16,35 +16,15 @@ def home():
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI Content Generator</title>
 <style>
-body {
-    font-family: Arial, sans-serif;
-    max-width: 700px;
-    margin: auto;
-    padding: 20px;
-    background: #fafafa;
-}
-h1 { text-align: center; }
-input, textarea, select, button {
-    width: 100%;
-    padding: 12px;
-    margin: 8px 0 15px;
-    box-sizing: border-box;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-}
+body { font-family: Arial; max-width: 700px; margin: auto; padding: 20px; background: #fafafa; }
+input, textarea, select, button { width: 100%; padding: 12px; margin: 8px 0 15px; box-sizing: border-box; border-radius: 8px; border: 1px solid #ccc; }
 textarea { min-height: 100px; }
-button {
-    background: #111;
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-}
+button { background: #111; color: white; border: none; cursor: pointer; font-weight: bold; }
 small { color: #666; }
 </style>
 </head>
-
 <body>
+
 <h1>🚀 AI Content Generator</h1>
 
 <form method="post" action="/generate">
@@ -56,8 +36,8 @@ small { color: #666; }
 <textarea name="topic" placeholder="Example: Diwali special cake offer" required></textarea>
 
 <label>Actual Product Details</label>
-<textarea name="details" placeholder="Example: Chocolate cake, vanilla cake, eggless options, prices..."></textarea>
-<small>AI will use only the details you provide and will avoid inventing products or ingredients.</small>
+<textarea name="details" placeholder="Example: Eggless cakes, starting price ₹499"></textarea>
+<small>Only the details you provide will be treated as business facts.</small>
 
 <label>Content Type</label>
 <select name="content_type">
@@ -108,9 +88,9 @@ def generate(
 ):
 
     prompt = f"""
-You are a professional marketing content writer.
+You are a factual marketing content writer.
 
-Create ready-to-publish marketing content.
+Create ready-to-publish marketing content using ONLY facts explicitly provided by the user.
 
 Business/Brand:
 {business}
@@ -130,13 +110,20 @@ Language:
 Tone:
 {tone}
 
-IMPORTANT RULES:
-1. Do NOT invent products, ingredients, prices, discounts, delivery promises,
-   dates, features, locations, or business facts.
-2. Only use specific product facts provided by the user.
-3. If important information is missing, keep the wording general instead of
-   making up facts.
-4. Make the content natural and suitable for the selected content type.
+STRICT RULES:
+- Never invent ingredients, prices, discounts, dates, phone numbers, addresses,
+  delivery options, product features, awards, certifications, guarantees,
+  or business claims.
+- Never claim something is premium, fresh, best, high-quality, handcrafted,
+  freshly baked, guaranteed, or similar unless the user explicitly provided
+  that fact.
+- Never create fake contact information.
+- Never assume missing business information.
+- Use only facts supplied by the user.
+- If information is missing, leave it out rather than inventing it.
+- You may use normal creative wording, but creative wording must not introduce
+  new factual claims.
+- Keep the content natural, concise, and ready to publish.
 
 Generate:
 1. Catchy Title
@@ -150,7 +137,7 @@ Generate:
         messages=[
             {
                 "role": "system",
-                "content": "You are a careful and professional marketing content writer. Never invent business facts."
+                "content": "You are a careful marketing writer. Never invent business facts."
             },
             {
                 "role": "user",
@@ -163,8 +150,8 @@ Generate:
 
     safe_answer = (
         answer.replace("&", "&amp;")
-              .replace("<", "&lt;")
-              .replace(">", "&gt;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
     )
 
     return f"""
@@ -174,40 +161,15 @@ Generate:
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Generated Content</title>
 <style>
-body {{
-    font-family: Arial, sans-serif;
-    max-width: 700px;
-    margin: auto;
-    padding: 20px;
-    background: #fafafa;
-}}
-.result {{
-    white-space: pre-wrap;
-    background: white;
-    padding: 18px;
-    border-radius: 10px;
-    border: 1px solid #ddd;
-}}
-button, a {{
-    display: inline-block;
-    padding: 12px 16px;
-    margin-top: 15px;
-    border-radius: 8px;
-    text-decoration: none;
-}}
-button {{
-    background: #111;
-    color: white;
-    border: none;
-}}
-a {{
-    background: #eee;
-    color: #111;
-}}
+body {{ font-family: Arial; max-width: 700px; margin: auto; padding: 20px; background: #fafafa; }}
+.result {{ white-space: pre-wrap; background: white; padding: 18px; border-radius: 10px; border: 1px solid #ddd; }}
+button, a {{ display: inline-block; padding: 12px 16px; margin-top: 15px; border-radius: 8px; text-decoration: none; }}
+button {{ background: #111; color: white; border: none; }}
+a {{ background: #eee; color: #111; }}
 </style>
 </head>
-
 <body>
+
 <h1>✅ Generated Content</h1>
 
 <div class="result" id="content">{safe_answer}</div>
