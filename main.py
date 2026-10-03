@@ -886,3 +886,340 @@ function shareWhatsApp() {{
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+
+
+# =========================
+# AI SERVICE ROUTER
+# =========================
+
+def detect_service(prompt: str) -> str:
+    text = prompt.lower()
+
+    if any(x in text for x in ["instagram", "facebook post", "caption", "hashtag", "advertisement", "ad copy", "whatsapp promotion"]):
+        return "content"
+
+    if any(x in text for x in ["image", "photo", "poster", "thumbnail", "logo", "background remove"]):
+        return "image"
+
+    if any(x in text for x in ["video", "reel", "short video", "video script"]):
+        return "video"
+
+    if any(x in text for x in ["voice", "voiceover", "voice over", "text to speech", "tts"]):
+        return "voice"
+
+    if any(x in text for x in ["website", "web app", "html", "css", "javascript", "android app", "apk", "game", "plugin", "api", "code"]):
+        return "development"
+
+    if any(x in text for x in ["resume", "cv", "cover letter", "pdf", "report", "document", "presentation", "ppt"]):
+        return "documents"
+
+    if any(x in text for x in ["business idea", "business plan", "marketing plan", "brand name", "slogan", "market research", "sales"]):
+        return "business"
+
+    if any(x in text for x in ["translate", "translation", "summarize", "summary", "rewrite", "grammar", "seo", "keyword", "research"]):
+        return "research"
+
+    if any(x in text for x in ["automation", "automate", "chatbot", "customer support", "lead generation", "workflow"]):
+        return "automation"
+
+    return "general"
+
+
+@app.post("/chat")
+async def chat(request: Request):
+    data = await request.json()
+    prompt = str(data.get("message", "")).strip()
+
+    if not prompt:
+        return {"error": "Message is required"}
+
+    service = detect_service(prompt)
+
+    system_prompt = f"""
+You are the main AI assistant of an AI services platform.
+
+Detected service category: {service}
+
+Your job:
+- Understand the user's request.
+- Give a useful direct answer.
+- If the request requires creation, provide the actual useful output.
+- Do not invent facts about a user's business, product, prices, phone numbers,
+  addresses, features, certifications or other real-world details.
+- Ask for missing information only when it is genuinely required.
+- For coding requests, provide practical working code.
+- For business/content requests, make the result ready to use.
+- Be concise but helpful.
+"""
+
+    response = client.chat.completions.create(
+        model="openai/gpt-oss-20b",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": prompt}
+        ],
+    )
+
+    return {
+        "service": service,
+        "answer": response.choices[0].message.content
+    }
+
+
+
+CHAT_HOME = r"""
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YourAI - AI Assistant</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#0b0d12;
+    color:#fff;
+}
+
+.home{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+}
+
+.top{
+    height:64px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 20px;
+    border-bottom:1px solid #222630;
+}
+
+.brand{
+    font-size:21px;
+    font-weight:700;
+}
+
+.brand span{
+    color:#8b7cff;
+}
+
+.menu-btn{
+    width:42px;
+    height:42px;
+    border:1px solid #303440;
+    border-radius:12px;
+    background:#151821;
+    color:white;
+    font-size:21px;
+}
+
+.chat{
+    width:min(900px,92%);
+    margin:auto;
+    padding:45px 0 30px;
+}
+
+.welcome{
+    text-align:center;
+    margin-bottom:30px;
+}
+
+.welcome h1{
+    font-size:36px;
+    margin:0 0 10px;
+}
+
+.welcome p{
+    color:#9298a8;
+    margin:0;
+}
+
+.box{
+    background:#151821;
+    border:1px solid #303440;
+    border-radius:18px;
+    padding:14px;
+}
+
+textarea{
+    width:100%;
+    min-height:90px;
+    resize:none;
+    background:transparent;
+    border:0;
+    outline:0;
+    color:white;
+    font-size:16px;
+}
+
+.bottom{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:8px;
+}
+
+.hint{
+    color:#747b8d;
+    font-size:12px;
+}
+
+.send{
+    border:0;
+    border-radius:12px;
+    padding:11px 18px;
+    background:#ffffff;
+    color:#111;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:9px;
+    justify-content:center;
+    margin-top:22px;
+}
+
+.chip{
+    border:1px solid #303440;
+    background:#151821;
+    color:#d9dce5;
+    border-radius:999px;
+    padding:9px 13px;
+    cursor:pointer;
+}
+
+.result{
+    margin-top:25px;
+    background:#11141b;
+    border:1px solid #292e39;
+    border-radius:16px;
+    padding:20px;
+    white-space:pre-wrap;
+    line-height:1.6;
+    display:none;
+}
+
+.service{
+    color:#9b91ff;
+    font-size:12px;
+    margin-bottom:10px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+}
+
+.loading{
+    color:#999;
+}
+</style>
+</head>
+
+<body>
+<div class="home">
+
+<header class="top">
+    <div class="brand">✨ <span>YourAI</span></div>
+    <button class="menu-btn" onclick="location.hash='services'">☰</button>
+</header>
+
+<main class="chat">
+
+<section class="welcome">
+    <h1>What can I help you with?</h1>
+    <p>Ask anything. Create, build, write, research or automate.</p>
+</section>
+
+<div class="box">
+    <textarea id="prompt"
+        placeholder="Ask anything... e.g. Build a website for my business"></textarea>
+
+    <div class="bottom">
+        <div class="hint">AI automatically selects the required service</div>
+        <button class="send" onclick="sendMessage()">➤</button>
+    </div>
+</div>
+
+<div class="chips">
+    <button class="chip" onclick="usePrompt('Create an Instagram post for my business')">✍️ Content</button>
+    <button class="chip" onclick="usePrompt('Create an AI image idea for my product')">🎨 Create</button>
+    <button class="chip" onclick="usePrompt('Build a simple website for my business')">💻 Build</button>
+    <button class="chip" onclick="usePrompt('Create an automation workflow for my business')">🤖 Automate</button>
+    <button class="chip" onclick="usePrompt('Give me a business plan')">📈 Business</button>
+    <button class="chip" onclick="usePrompt('Research this topic for me')">🔎 Research</button>
+</div>
+
+<div id="result" class="result"></div>
+
+</main>
+</div>
+
+<script>
+function usePrompt(text){
+    document.getElementById("prompt").value=text;
+    document.getElementById("prompt").focus();
+}
+
+async function sendMessage(){
+
+    const input=document.getElementById("prompt");
+    const result=document.getElementById("result");
+    const message=input.value.trim();
+
+    if(!message) return;
+
+    result.style.display="block";
+    result.innerHTML='<div class="loading">AI is working...</div>';
+
+    try{
+        const response=await fetch("/chat",{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                message:message
+            })
+        });
+
+        const data=await response.json();
+
+        if(data.error){
+            result.innerText=data.error;
+            return;
+        }
+
+        result.innerHTML=
+            '<div class="service">'+data.service+'</div>'+
+            data.answer
+                .replace(/&/g,"&amp;")
+                .replace(/</g,"&lt;")
+                .replace(/>/g,"&gt;");
+
+    }catch(error){
+        result.innerText="Something went wrong. Please try again.";
+    }
+}
+
+document.getElementById("prompt").addEventListener("keydown",function(e){
+    if(e.key==="Enter" && !e.shiftKey){
+        e.preventDefault();
+        sendMessage();
+    }
+});
+</script>
+
+</body>
+</html>
+"""
+
+@app.get("/chat-home", response_class=HTMLResponse)
+def chat_home():
+    return CHAT_HOME
