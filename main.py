@@ -14,21 +14,66 @@ def home():
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI Content Generator</title>
+<title>ContentAI - AI Content Generator</title>
 <style>
+* { box-sizing: border-box; }
 body {
-    font-family: Arial;
-    max-width: 700px;
-    margin: auto;
-    padding: 20px;
-    background: #fafafa;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f7f7fb;
+    color: #111;
 }
-h1 { text-align: center; }
+.hero {
+    text-align: center;
+    padding: 60px 20px 40px;
+    background: white;
+}
+.hero h1 {
+    font-size: 42px;
+    margin: 0 0 15px;
+}
+.hero p {
+    color: #666;
+    font-size: 18px;
+    max-width: 600px;
+    margin: auto;
+}
+.btn {
+    display: inline-block;
+    margin-top: 25px;
+    padding: 14px 25px;
+    background: #111;
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: bold;
+}
+.features {
+    max-width: 900px;
+    margin: auto;
+    padding: 40px 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    border: 1px solid #eee;
+}
+.generator {
+    max-width: 700px;
+    margin: 20px auto 50px;
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+}
 input, textarea, select, button {
     width: 100%;
     padding: 12px;
     margin: 8px 0 15px;
-    box-sizing: border-box;
     border-radius: 8px;
     border: 1px solid #ccc;
 }
@@ -36,17 +81,41 @@ textarea { min-height: 100px; }
 button {
     background: #111;
     color: white;
-    border: none;
-    cursor: pointer;
+    border: 0;
     font-weight: bold;
+    cursor: pointer;
 }
-small { color: #666; }
+label { font-weight: bold; }
 </style>
 </head>
 
 <body>
 
-<h1>🚀 AI Content Generator</h1>
+<section class="hero">
+    <h1>✨ ContentAI</h1>
+    <p>Create social media posts, WhatsApp promotions and product descriptions with AI in seconds.</p>
+    <a class="btn" href="#generator">🚀 Try Free</a>
+</section>
+
+<section class="features">
+    <div class="card">
+        <h2>📱 Social Posts</h2>
+        <p>Create ready-to-publish Instagram and Facebook content.</p>
+    </div>
+
+    <div class="card">
+        <h2>💬 WhatsApp</h2>
+        <p>Create promotional messages that are easy to copy and share.</p>
+    </div>
+
+    <div class="card">
+        <h2>📝 Product Copy</h2>
+        <p>Generate clear product descriptions for your business.</p>
+    </div>
+</section>
+
+<section class="generator" id="generator">
+<h2>🚀 Try ContentAI Free</h2>
 
 <form method="post" action="/generate">
 
@@ -54,7 +123,7 @@ small { color: #666; }
 <input name="business" placeholder="Example: Sharma Bakery" required>
 
 <label>Topic / Offer</label>
-<textarea name="topic" placeholder="Example: Diwali special cake offer" required></textarea>
+<textarea name="topic" placeholder="Example: Diwali special eggless cake offer" required></textarea>
 
 <label>Actual Product Details</label>
 <textarea name="details" placeholder="Example: Eggless cakes, starting price ₹499"></textarea>
@@ -94,6 +163,7 @@ small { color: #666; }
 <button type="submit">✨ Generate Content</button>
 
 </form>
+</section>
 
 </body>
 </html>
@@ -147,26 +217,26 @@ STRICT RULES:
   guarantees, or business claims.
 - Do not claim something is best, premium, fresh, high quality,
   perfectly sweet, handcrafted, made with love, or similar unless
-  the user explicitly provided that fact.
+  explicitly provided.
 - Never create fake contact information.
 - If information is missing, leave it out.
-- Creative wording is allowed only when it does not introduce a new
-  factual claim.
+- Creative wording must not introduce new factual claims.
 
-Create TWO versions:
+Create THREE sections:
 
-VERSION 1 — Social Media
-1. Catchy Title
-2. Main Content
-3. Call To Action
-4. 8 relevant hashtags
+SOCIAL MEDIA
+Catchy Title
+Main Content
+Call To Action
+8 relevant hashtags
 
-VERSION 2 — WhatsApp
-Write a short WhatsApp-ready promotional message.
-Use simple formatting and emojis where appropriate.
-Do not add any facts that were not supplied.
+WHATSAPP
+A short WhatsApp-ready promotional message.
 
-Keep both versions natural and ready to copy.
+PRODUCT DESCRIPTION
+A concise product description.
+
+Keep everything natural and ready to copy.
 """
 
     response = client.chat.completions.create(
@@ -196,97 +266,73 @@ Keep both versions natural and ready to copy.
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Generated Content</title>
-
+<title>ContentAI Result</title>
 <style>
 body {{
     font-family: Arial;
-    max-width: 700px;
+    max-width: 800px;
     margin: auto;
     padding: 20px;
-    background: #fafafa;
+    background: #f7f7fb;
 }}
-
-.result {{
-    white-space: pre-wrap;
+.card {{
     background: white;
-    padding: 18px;
-    border-radius: 10px;
+    padding: 20px;
+    margin: 15px 0;
+    border-radius: 12px;
     border: 1px solid #ddd;
+}}
+.content {{
+    white-space: pre-wrap;
     line-height: 1.6;
 }}
-
-.actions {{
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-}}
-
 button, a {{
-    flex: 1;
-    padding: 12px;
+    display: inline-block;
+    padding: 12px 18px;
+    margin-top: 12px;
     border-radius: 8px;
-    text-align: center;
     text-decoration: none;
     font-weight: bold;
 }}
-
 button {{
     background: #111;
     color: white;
     border: none;
 }}
-
 a {{
     background: #eee;
     color: #111;
-}}
-
-.message {{
-    margin-top: 10px;
-    color: green;
-    font-weight: bold;
-    text-align: center;
 }}
 </style>
 </head>
 
 <body>
 
-<h1>✅ Generated Content</h1>
+<h1>✅ Your AI Content</h1>
 
-<div class="result" id="content">{safe_answer}</div>
+<div class="card">
+<h2>📄 Generated Content</h2>
+<div class="content" id="content">{safe_answer}</div>
 
-<div class="actions">
-<button onclick="copyContent()">📋 Copy</button>
+<button onclick="copyContent()">📋 Copy All</button>
 <button onclick="shareWhatsApp()">💬 WhatsApp</button>
 </div>
 
-<a href="/" style="display:block;margin-top:12px;">
-🔄 Generate Another
-</a>
-
-<div class="message" id="message"></div>
+<a href="/">🔄 Create Another</a>
 
 <script>
 function copyContent() {{
     const text = document.getElementById("content").innerText;
-
-    navigator.clipboard.writeText(text)
-    .then(function() {{
-        document.getElementById("message").innerText =
-        "✅ Content copied!";
-    }})
-    .catch(function() {{
-        document.getElementById("message").innerText =
-        "Please select and copy the content manually.";
-    }});
+    navigator.clipboard.writeText(text);
+    alert("✅ Content copied!");
 }}
 
 function shareWhatsApp() {{
     const text = document.getElementById("content").innerText;
-    const url = "https://wa.me/?text=" + encodeURIComponent(text);
-    window.open(url, "_blank");
+    window.open(
+        "https://wa.me/?text=" + encodeURIComponent(text),
+        "_blank"
+    );
 }}
 </script>
 
