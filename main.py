@@ -138,22 +138,373 @@ button {
 label {
     font-weight: bold;
 }
+
+/* ===== PROFESSIONAL NAVIGATION ===== */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    height: 70px;
+    background: rgba(255,255,255,.96);
+    border-bottom: 1px solid #e8e8ed;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 22px;
+    backdrop-filter: blur(12px);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 21px;
+    font-weight: 800;
+    text-decoration: none;
+    color: #111;
+}
+
+.brand-mark {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    background: #111;
+    color: white;
+    display: grid;
+    place-items: center;
+}
+
+.menu-btn {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #e5e5ea;
+    background: white;
+    color: #111;
+    border-radius: 11px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+}
+
+.menu-btn:hover {
+    background: #f5f5f7;
+}
+
+.menu-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.28);
+    z-index: 1090;
+    opacity: 0;
+    visibility: hidden;
+    transition: .2s ease;
+}
+
+.menu-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.side-menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: min(370px, 88vw);
+    height: 100vh;
+    background: white;
+    z-index: 1100;
+    transform: translateX(100%);
+    transition: transform .25s ease;
+    box-shadow: -12px 0 35px rgba(0,0,0,.12);
+    overflow-y: auto;
+}
+
+.side-menu.open {
+    transform: translateX(0);
+}
+
+.menu-head {
+    height: 70px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #eee;
+}
+
+.menu-title {
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.close-btn {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #eee;
+    background: #f7f7f8;
+    color: #111;
+    border-radius: 10px;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+}
+
+.menu-section {
+    padding: 20px;
+}
+
+.menu-label {
+    font-size: 12px;
+    font-weight: 800;
+    color: #8a8a93;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    margin-bottom: 10px;
+}
+
+.menu-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 13px 12px;
+    margin: 3px 0;
+    color: #17171a;
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.menu-item:hover {
+    background: #f5f5f7;
+}
+
+.menu-icon {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    background: #f3f3f5;
+}
+
+.menu-item.game {
+    background: #111;
+    color: white;
+    margin-top: 8px;
+}
+
+.menu-item.game:hover {
+    background: #222;
+}
+
+.menu-item.game .menu-icon {
+    background: #2d2d31;
+}
+
+.menu-sub {
+    margin-left: 51px;
+    border-left: 1px solid #e5e5e8;
+    padding-left: 12px;
+}
+
+.menu-sub a {
+    display: block;
+    padding: 9px 10px;
+    color: #666;
+    text-decoration: none;
+    font-size: 14px;
+    border-radius: 8px;
+}
+
+.menu-sub a:hover {
+    background: #f5f5f7;
+    color: #111;
+}
+
+@media (max-width: 600px) {
+    .navbar {
+        padding: 0 15px;
+    }
+
+    .brand {
+        font-size: 19px;
+    }
+
+    .hero {
+        padding-top: 45px;
+    }
+}
+
 </style>
 </head>
 
 <body>
 
+<nav class="navbar">
+
+<a class="brand" href="/">
+    <span class="brand-mark">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none">
+            <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"
+                  fill="currentColor"/>
+            <path d="M19 16l.7 2.3L22 19l-2.3.7L19 22l-.7-2.3L16 19l2.3-.7L19 16z"
+                  fill="currentColor"/>
+        </svg>
+    </span>
+    ContentAI
+</a>
+
+<button class="menu-btn" onclick="openMenu()" aria-label="Open menu">
+    <svg width="23" height="23" viewBox="0 0 24 24" fill="none">
+        <path d="M4 6h16M4 12h16M4 18h16"
+              stroke="currentColor" stroke-width="2"
+              stroke-linecap="round"/>
+    </svg>
+</button>
+
+</nav>
+
+<div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
+
+<aside class="side-menu" id="sideMenu">
+
+    <div class="menu-head">
+        <div class="menu-title">Services</div>
+
+        <button class="close-btn" onclick="closeMenu()" aria-label="Close menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M6 6l12 12M18 6L6 18"
+                      stroke="currentColor" stroke-width="2"
+                      stroke-linecap="round"/>
+            </svg>
+        </button>
+    </div>
+
+    <div class="menu-section">
+
+        <div class="menu-label">AI Content</div>
+
+        <a class="menu-item" href="#generator" onclick="closeMenu()">
+            <span class="menu-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <rect x="3" y="3" width="18" height="18" rx="5"
+                          stroke="currentColor" stroke-width="1.8"/>
+                    <circle cx="12" cy="12" r="4"
+                            stroke="currentColor" stroke-width="1.8"/>
+                    <circle cx="17.5" cy="6.5" r="1"
+                            fill="currentColor"/>
+                </svg>
+            </span>
+            Instagram Content
+        </a>
+
+        <a class="menu-item" href="#generator" onclick="closeMenu()">
+            <span class="menu-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.7-1.2A9 9 0 1 0 12 3z"
+                          stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M8.5 8.5c.4-.5.8-.5 1.1-.1l1 1.3c.2.3.2.6 0 .9l-.5.6c.8 1.4 1.8 2.3 3.2 3.1l.6-.5c.3-.2.6-.2.9 0l1.3 1c.4.3.4.7-.1 1.1-.6.6-1.5.8-2.3.5-2.8-.9-5.2-3.3-6.1-6.1-.3-.8-.1-1.7.5-2.3z"
+                          stroke="currentColor" stroke-width="1.3"/>
+                </svg>
+            </span>
+            WhatsApp Promotion
+        </a>
+
+        <a class="menu-item" href="#generator" onclick="closeMenu()">
+            <span class="menu-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M4 7h16v13H4z"
+                          stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M8 7V5h8v2M8 12h8M8 16h5"
+                          stroke="currentColor" stroke-width="1.8"
+                          stroke-linecap="round"/>
+                </svg>
+            </span>
+            Product Description
+        </a>
+
+        <a class="menu-item" href="#generator" onclick="closeMenu()">
+            <span class="menu-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M4 20V10M10 20V4M16 20v-7M22 20H2"
+                          stroke="currentColor" stroke-width="1.8"
+                          stroke-linecap="round"/>
+                </svg>
+            </span>
+            Advertisement Copy
+        </a>
+
+        <a class="menu-item" href="#generator" onclick="closeMenu()">
+            <span class="menu-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <rect x="3" y="5" width="18" height="14" rx="3"
+                          stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M10 9l5 3-5 3V9z" fill="currentColor"/>
+                </svg>
+            </span>
+            YouTube Description
+        </a>
+
+        <div class="menu-label" style="margin-top:24px;">AI Development</div>
+
+        <a class="menu-item game" href="#game-builder" onclick="closeMenu()">
+            <span class="menu-icon">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none">
+                    <path d="M8 13l-2 4a2.5 2.5 0 0 0 4.3 2.4L12 17l1.7 2.4A2.5 2.5 0 0 0 18 17l-2-4"
+                          stroke="currentColor" stroke-width="1.8"
+                          stroke-linecap="round"/>
+                    <rect x="6" y="5" width="12" height="10" rx="5"
+                          stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M9 10h3M10.5 8.5v3"
+                          stroke="currentColor" stroke-width="1.8"
+                          stroke-linecap="round"/>
+                    <circle cx="15.5" cy="9.5" r=".8" fill="currentColor"/>
+                </svg>
+            </span>
+            Game &amp; App Builder
+        </a>
+
+        <div class="menu-sub" id="game-builder">
+            <a href="#generator" onclick="closeMenu()">Web Game</a>
+            <a href="#generator" onclick="closeMenu()">Android App</a>
+            <a href="#generator" onclick="closeMenu()">Plugin</a>
+            <a href="#generator" onclick="closeMenu()">Custom AI Project</a>
+        </div>
+
+        <div class="menu-label" style="margin-top:24px;">More</div>
+
+        <a class="menu-item" href="#generator" onclick="closeMenu()">
+            <span class="menu-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="9"
+                            stroke="currentColor" stroke-width="1.8"/>
+                    <path d="M12 10v6M12 7.5v.2"
+                          stroke="currentColor" stroke-width="1.8"
+                          stroke-linecap="round"/>
+                </svg>
+            </span>
+            How It Works
+        </a>
+
+    </div>
+</aside>
+
+
 <section class="hero">
 
-<h1>✨ ContentAI</h1>
+<h1>ContentAI</h1>
 
 <p>
 Create social media posts, WhatsApp promotions and product descriptions with AI in seconds.
 </p>
 
-<a class="btn" href="#generator">🚀 Try Free</a>
+<a class="btn" href="#generator">Try Free</a>
 
-<div class="limit">🎁 3 free generations per day</div>
+<div class="limit">3 free generations per day</div>
 
 </section>
 
@@ -263,6 +614,27 @@ fill="none" stroke="currentColor" stroke-width="1.5"/>
 </form>
 
 </section>
+
+
+<script>
+function openMenu() {
+    document.getElementById("sideMenu").classList.add("open");
+    document.getElementById("menuOverlay").classList.add("open");
+    document.body.style.overflow = "hidden";
+}
+
+function closeMenu() {
+    document.getElementById("sideMenu").classList.remove("open");
+    document.getElementById("menuOverlay").classList.remove("open");
+    document.body.style.overflow = "";
+}
+
+document.addEventListener("keydown", function(event) {
+    if (event.key === "Escape") {
+        closeMenu();
+    }
+});
+</script>
 
 </body>
 </html>
