@@ -973,7 +973,7 @@ CHAT_HOME = r"""
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>YourAI - AI Assistant</title>
+<title>YourAI</title>
 
 <style>
 *{box-sizing:border-box}
@@ -981,204 +981,242 @@ CHAT_HOME = r"""
 body{
     margin:0;
     font-family:Arial,sans-serif;
-    background:#0b0d12;
+    background:#212121;
     color:#fff;
 }
 
-.home{
-    min-height:100vh;
+.app{
+    height:100vh;
     display:flex;
     flex-direction:column;
 }
 
-.top{
-    height:64px;
+.header{
+    height:60px;
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding:0 20px;
-    border-bottom:1px solid #222630;
+    padding:0 16px;
+    border-bottom:1px solid #333;
 }
 
-.brand{
-    font-size:21px;
+.logo{
+    font-size:19px;
     font-weight:700;
 }
 
-.brand span{
-    color:#8b7cff;
-}
-
-.menu-btn{
+.menu{
     width:42px;
     height:42px;
-    border:1px solid #303440;
-    border-radius:12px;
-    background:#151821;
+    border:0;
+    border-radius:10px;
+    background:#2f2f2f;
     color:white;
     font-size:21px;
 }
 
-.chat{
-    width:min(900px,92%);
-    margin:auto;
-    padding:45px 0 30px;
+.messages{
+    flex:1;
+    overflow-y:auto;
+    padding:30px 18px 150px;
 }
 
 .welcome{
+    min-height:65%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
     text-align:center;
-    margin-bottom:30px;
 }
 
 .welcome h1{
-    font-size:36px;
-    margin:0 0 10px;
+    font-size:30px;
+    margin-bottom:8px;
 }
 
 .welcome p{
-    color:#9298a8;
+    color:#aaa;
     margin:0;
 }
 
-.box{
-    background:#151821;
-    border:1px solid #303440;
+.message{
+    max-width:760px;
+    margin:0 auto 25px;
+    line-height:1.6;
+    white-space:pre-wrap;
+}
+
+.user{
+    background:#2f2f2f;
     border-radius:18px;
-    padding:14px;
+    padding:12px 16px;
+    margin-left:auto;
+    width:fit-content;
+    max-width:80%;
+}
+
+.ai{
+    padding:8px 2px;
+}
+
+.composer-wrap{
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    background:linear-gradient(transparent,#212121 30%);
+    padding:25px 16px 20px;
+}
+
+.composer{
+    max-width:760px;
+    margin:auto;
+    background:#2f2f2f;
+    border:1px solid #444;
+    border-radius:18px;
+    padding:10px 12px;
 }
 
 textarea{
     width:100%;
-    min-height:90px;
-    resize:none;
-    background:transparent;
     border:0;
     outline:0;
-    color:white;
+    resize:none;
+    background:transparent;
+    color:#fff;
     font-size:16px;
+    min-height:48px;
+    max-height:180px;
 }
 
-.bottom{
+.row{
     display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-top:8px;
-}
-
-.hint{
-    color:#747b8d;
-    font-size:12px;
+    justify-content:flex-end;
 }
 
 .send{
+    width:38px;
+    height:38px;
     border:0;
-    border-radius:12px;
-    padding:11px 18px;
-    background:#ffffff;
+    border-radius:50%;
+    background:#fff;
     color:#111;
-    font-weight:700;
-    cursor:pointer;
+    font-size:18px;
 }
 
-.chips{
-    display:flex;
-    flex-wrap:wrap;
-    gap:9px;
-    justify-content:center;
-    margin-top:22px;
-}
-
-.chip{
-    border:1px solid #303440;
-    background:#151821;
-    color:#d9dce5;
-    border-radius:999px;
-    padding:9px 13px;
-    cursor:pointer;
-}
-
-.result{
-    margin-top:25px;
-    background:#11141b;
-    border:1px solid #292e39;
-    border-radius:16px;
-    padding:20px;
-    white-space:pre-wrap;
-    line-height:1.6;
-    display:none;
-}
-
-.service{
-    color:#9b91ff;
+.status{
+    text-align:center;
+    color:#888;
     font-size:12px;
-    margin-bottom:10px;
-    text-transform:uppercase;
-    letter-spacing:1px;
+    margin-top:7px;
 }
 
-.loading{
-    color:#999;
+@media(max-width:600px){
+    .welcome h1{font-size:25px}
+    .messages{padding-left:12px;padding-right:12px}
 }
 </style>
 </head>
 
 <body>
-<div class="home">
 
-<header class="top">
-    <div class="brand">✨ <span>YourAI</span></div>
-    <button class="menu-btn" onclick="location.hash='services'">☰</button>
+<div class="app">
+
+<header class="header">
+    <div class="logo">✨ YourAI</div>
+    <button class="menu" onclick="openServices()">☰</button>
 </header>
 
-<main class="chat">
+<main id="messages" class="messages">
 
-<section class="welcome">
-    <h1>What can I help you with?</h1>
-    <p>Ask anything. Create, build, write, research or automate.</p>
-</section>
-
-<div class="box">
-    <textarea id="prompt"
-        placeholder="Ask anything... e.g. Build a website for my business"></textarea>
-
-    <div class="bottom">
-        <div class="hint">AI automatically selects the required service</div>
-        <button class="send" onclick="sendMessage()">➤</button>
+    <div id="welcome" class="welcome">
+        <h1>How can I help you?</h1>
+        <p>Ask anything or choose a service from the menu.</p>
     </div>
-</div>
-
-<div class="chips">
-    <button class="chip" onclick="usePrompt('Create an Instagram post for my business')">✍️ Content</button>
-    <button class="chip" onclick="usePrompt('Create an AI image idea for my product')">🎨 Create</button>
-    <button class="chip" onclick="usePrompt('Build a simple website for my business')">💻 Build</button>
-    <button class="chip" onclick="usePrompt('Create an automation workflow for my business')">🤖 Automate</button>
-    <button class="chip" onclick="usePrompt('Give me a business plan')">📈 Business</button>
-    <button class="chip" onclick="usePrompt('Research this topic for me')">🔎 Research</button>
-</div>
-
-<div id="result" class="result"></div>
 
 </main>
+
+<div class="composer-wrap">
+
+    <div class="composer">
+
+        <textarea
+            id="prompt"
+            rows="1"
+            placeholder="Message YourAI..."
+            onkeydown="handleKey(event)"
+        ></textarea>
+
+        <div class="row">
+            <button class="send" onclick="sendMessage()">↑</button>
+        </div>
+
+    </div>
+
+    <div class="status">
+        YourAI can make mistakes. Check important information.
+    </div>
+
 </div>
 
 <script>
-function usePrompt(text){
-    document.getElementById("prompt").value=text;
-    document.getElementById("prompt").focus();
+
+function openServices(){
+    /*
+      Existing hamburger/service navigation remains available.
+      Hash is used so the existing menu system can handle it.
+    */
+    location.hash="services";
+}
+
+function handleKey(e){
+    if(e.key==="Enter" && !e.shiftKey){
+        e.preventDefault();
+        sendMessage();
+    }
+}
+
+function addMessage(text,type){
+
+    const messages=document.getElementById("messages");
+    const welcome=document.getElementById("welcome");
+
+    if(welcome) welcome.remove();
+
+    const div=document.createElement("div");
+    div.className="message";
+
+    if(type==="user"){
+        div.innerHTML='<div class="user"></div>';
+        div.querySelector(".user").textContent=text;
+    }else{
+        div.innerHTML='<div class="ai"></div>';
+        div.querySelector(".ai").textContent=text;
+    }
+
+    messages.appendChild(div);
+    messages.scrollTop=messages.scrollHeight;
 }
 
 async function sendMessage(){
 
     const input=document.getElementById("prompt");
-    const result=document.getElementById("result");
     const message=input.value.trim();
 
     if(!message) return;
 
-    result.style.display="block";
-    result.innerHTML='<div class="loading">AI is working...</div>';
+    input.value="";
+
+    addMessage(message,"user");
+    addMessage("Thinking...","ai");
+
+    const messages=document.getElementById("messages");
+    const aiMessages=messages.querySelectorAll(".ai");
+    const currentAI=aiMessages[aiMessages.length-1];
 
     try{
+
         const response=await fetch("/chat",{
             method:"POST",
             headers:{
@@ -1192,29 +1230,21 @@ async function sendMessage(){
         const data=await response.json();
 
         if(data.error){
-            result.innerText=data.error;
-            return;
+            currentAI.textContent=data.error;
+        }else{
+            currentAI.textContent=data.answer;
         }
 
-        result.innerHTML=
-            '<div class="service">'+data.service+'</div>'+
-            data.answer
-                .replace(/&/g,"&amp;")
-                .replace(/</g,"&lt;")
-                .replace(/>/g,"&gt;");
-
     }catch(error){
-        result.innerText="Something went wrong. Please try again.";
+        currentAI.textContent="Something went wrong. Please try again.";
     }
+
+    messages.scrollTop=messages.scrollHeight;
 }
 
-document.getElementById("prompt").addEventListener("keydown",function(e){
-    if(e.key==="Enter" && !e.shiftKey){
-        e.preventDefault();
-        sendMessage();
-    }
-});
 </script>
+
+</div>
 
 </body>
 </html>
