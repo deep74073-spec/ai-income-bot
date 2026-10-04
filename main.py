@@ -308,6 +308,13 @@ def detect_service(prompt: str) -> str:
     if any(x in text for x in ["translate", "translation", "summarize", "summary", "rewrite", "grammar", "seo", "keyword", "research"]):
         return "research"
 
+    if any(x in text for x in [
+        "product", "price comparison", "compare price", "best deal",
+        "deal finder", "buying guide", "buyer's guide", "shopping",
+        "product review", "product link", "where to buy", "which product"
+    ]):
+        return "shopping"
+
     if any(x in text for x in ["automation", "automate", "chatbot", "customer support", "lead generation", "workflow"]):
         return "automation"
 
@@ -595,6 +602,270 @@ async function sendMessage(){
 
 </div>
 
+</body>
+</html>
+"""
+
+
+@app.get("/service/{service_name}", response_class=HTMLResponse)
+def service_page(service_name: str):
+    service = service_name.replace("-", " ").strip()
+
+    return f"""
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>YourAI - {service}</title>
+<style>
+*{{box-sizing:border-box}}
+body{{
+    margin:0;background:#212121;color:#fff;
+    font-family:Arial,sans-serif;
+}}
+.header{{
+    height:60px;display:flex;align-items:center;
+    padding:0 16px;border-bottom:1px solid #333;
+}}
+.back{{
+    border:0;background:#2f2f2f;color:#fff;
+    border-radius:10px;padding:10px 14px;cursor:pointer;
+}}
+.container{{
+    max-width:760px;margin:0 auto;padding:35px 18px 60px;
+}}
+h1{{font-size:30px;margin:0 0 10px}}
+.sub{{color:#aaa;margin-bottom:28px}}
+label{{
+    display:block;margin:18px 0 8px;
+    color:#ddd;font-weight:600;
+}}
+textarea,input,select{{
+    width:100%;background:#2f2f2f;color:#fff;
+    border:1px solid #444;border-radius:12px;
+    padding:13px;font-size:15px;outline:none;
+}}
+textarea{{min-height:130px;resize:vertical}}
+.generate{{
+    width:100%;margin-top:22px;padding:14px;
+    border:0;border-radius:12px;background:#fff;color:#111;
+    font-size:16px;font-weight:700;cursor:pointer;
+}}
+#result{{
+    margin-top:25px;padding:18px;background:#2f2f2f;
+    border:1px solid #444;border-radius:14px;
+    white-space:pre-wrap;line-height:1.6;display:none;
+}}
+.status{{color:#999;text-align:center;margin-top:10px;font-size:13px}}
+.field-grid{{display:grid;grid-template-columns:1fr 1fr;gap:14px}}
+@media(max-width:600px){{
+    .field-grid{{grid-template-columns:1fr}}
+}}
+</style>
+</head>
+
+<body>
+<header class="header">
+<button class="back" onclick="location.href='/'">← Back</button>
+</header>
+
+<main class="container">
+<h1>✨ {service}</h1>
+<p class="sub">Tell YourAI what you need. The AI will automatically focus on this service.</p>
+
+<div id="smartFields"></div>
+
+<label>Language</label>
+<select id="language">
+<option>English</option>
+<option>Hindi</option>
+<option>Hinglish</option>
+<option>Punjabi</option>
+</select>
+
+<label>Tone / Style</label>
+<select id="tone">
+<option>Professional</option>
+<option>Friendly</option>
+<option>Creative</option>
+<option>Simple</option>
+<option>Persuasive</option>
+</select>
+
+<label>Additional Requirements</label>
+<textarea id="details" placeholder="Add any extra instructions, details, links, keywords, features, etc."></textarea>
+
+<button class="generate" onclick="generateService()">Generate with AI</button>
+
+<div id="result"></div>
+<div class="status">YourAI can make mistakes. Check important information.</div>
+</main>
+
+<script>
+const SERVICE = {service!r};
+
+function field(label, id, placeholder){{
+    return `
+    <label>${{label}}</label>
+    <input id="${{id}}" placeholder="${{placeholder}}">
+    `;
+}}
+
+function buildFields(){{
+    const box=document.getElementById("smartFields");
+    let html="";
+
+    if(["Instagram Post","Facebook Post","WhatsApp Promotion",
+        "Advertisement Copy","Product Description","YouTube Description",
+        "Blog / Article","SEO Content","Email Writer"].includes(SERVICE)){{
+        html += field("Topic / Product / Subject","topic","What should the content be about?");
+        html += field("Target Audience","audience","Who is this for?");
+        html += field("Main Goal / CTA","goal","Example: Buy now, contact us, visit website");
+    }}
+    else if(["AI Image","Image Enhancement","Background Removal",
+             "Logo & Brand Ideas","Poster / Flyer","Thumbnail"].includes(SERVICE)){{
+        html += field("Subject / Main Idea","topic","What should the visual contain?");
+        html += field("Style","style","Example: modern, realistic, minimal, cinematic");
+        html += field("Size / Format","format","Example: square, portrait, landscape, YouTube");
+    }}
+    else if(["AI Video","Reel / Short Script","Subtitle Generator"].includes(SERVICE)){{
+        html += field("Video Topic","topic","What is the video about?");
+        html += field("Target Audience","audience","Who will watch it?");
+        html += field("Duration","duration","Example: 30 seconds, 60 seconds");
+    }}
+    else if(["AI Voice","Text to Speech","Audio Tools"].includes(SERVICE)){{
+        html += field("Text / Script","topic","Enter the text or describe the audio");
+        html += field("Voice Style","style","Example: calm, energetic, professional");
+    }}
+    else if(["Resume / CV","Cover Letter"].includes(SERVICE)){{
+        html += field("Job Role","role","Example: Software Developer");
+        html += field("Experience","experience","Fresher / years of experience");
+        html += field("Skills","skills","List your important skills");
+    }}
+    else if(["PDF Summarizer","Notes Generator","Report Generator",
+             "Presentation / PPT"].includes(SERVICE)){{
+        html += field("Topic / Document Subject","topic","What is the document about?");
+        html += field("Audience","audience","Student, client, team, etc.");
+        html += field("Length / Slides","length","Example: 5 pages or 10 slides");
+    }}
+    else if(["Business Ideas","Business Plan","Marketing Plan",
+             "Market Research","Pricing Ideas","Sales Copy"].includes(SERVICE)){{
+        html += field("Business / Product","business","What business or product?");
+        html += field("Target Market","market","Who are your customers?");
+        html += field("Budget","budget","Optional budget");
+    }}
+    else if(["Brand Name Generator","Slogan Generator"].includes(SERVICE)){{
+        html += field("Business / Product","business","What is the brand about?");
+        html += field("Brand Style","style","Modern, premium, fun, traditional, etc.");
+    }}
+    else if(["Web App Builder","Android App Builder","Web Game Builder",
+             "Android Game","Plugin Builder","API Builder",
+             "Automation Tool","Code Generator","Bug Fix",
+             "Custom AI Project","Build My AI Tool"].includes(SERVICE)){{
+        html += field("Project / Feature","project","What do you want to build or fix?");
+        html += field("Technology","technology","Example: Python, JavaScript, Android");
+        html += field("Requirements","requirements","Important features or constraints");
+    }}
+    else if(["AI Chatbot","Customer Support Bot","FAQ Bot",
+             "Email Automation","WhatsApp Automation",
+             "Lead Generator","Business Workflow"].includes(SERVICE)){{
+        html += field("Business / Use Case","usecase","What should the automation do?");
+        html += field("Target Users","users","Customers, leads, employees, etc.");
+        html += field("Goal","goal","What result do you want?");
+    }}
+    else if(["Product Search","Price Comparison","Best Deal Finder"].includes(SERVICE)){{
+        html += field("Product / Category","product","Example: wireless earbuds, laptop, shoes");
+        html += field("Budget","budget","Example: ₹20,000");
+        html += field("Preferred Brand","brand","Optional");
+        html += field("Important Features","features","What features matter most?");
+    }}
+    else if(["Product Comparison"].includes(SERVICE)){{
+        html += field("Product A","productA","Enter first product name or link");
+        html += field("Product B","productB","Enter second product name or link");
+        html += field("Comparison Criteria","criteria","Price, performance, camera, battery, etc.");
+    }}
+    else if(["Product Review Summary"].includes(SERVICE)){{
+        html += field("Product","product","Enter product name or link");
+        html += field("Review Text","reviews","Paste reviews here if available");
+        html += field("What to Focus On","focus","Pros, cons, reliability, value, etc.");
+    }}
+    else if(["Buyers Guide"].includes(SERVICE)){{
+        html += field("Product Category","category","Example: phone, laptop, headphones");
+        html += field("Budget","budget","Example: ₹30,000");
+        html += field("Use Case","usecase","Gaming, study, business, travel, etc.");
+        html += field("Must-Have Features","features","Important requirements");
+    }}
+    else if(["Product Link Finder"].includes(SERVICE)){{
+        html += field("Product","product","Enter product name/model");
+        html += field("Variant","variant","Size, storage, color, model, etc.");
+        html += field("Preferred Store","store","Optional");
+    }}
+    else if(["AI Research","Summarizer","Translator","Grammar & Rewrite",
+             "Keyword Generator","Prompt Generator","Prompt Optimizer",
+             "JSON Generator"].includes(SERVICE)){{
+        html += field("Topic / Text","topic","Enter the topic, text or task");
+        html += field("Desired Output","output","What should the final result look like?");
+    }}
+    else{{
+        html += field("Main Requirement","topic","Describe what you want YourAI to do");
+    }}
+
+    box.innerHTML=html;
+}}
+
+function getValue(id){{
+    const el=document.getElementById(id);
+    return el ? el.value.trim() : "";
+}}
+
+async function generateService(){{
+    const language=document.getElementById("language").value;
+    const tone=document.getElementById("tone").value;
+    const details=getValue("details");
+    const result=document.getElementById("result");
+
+    const inputs=[];
+    document.querySelectorAll("#smartFields input").forEach(el=>{{
+        if(el.value.trim()){{
+            const label=el.previousElementSibling
+                ? el.previousElementSibling.textContent
+                : el.id;
+            inputs.push(label + ": " + el.value.trim());
+        }}
+    }});
+
+    if(!inputs.length && !details){{
+        result.style.display="block";
+        result.textContent="Please enter some details first.";
+        return;
+    }}
+
+    result.style.display="block";
+    result.textContent="Thinking...";
+
+    const prompt =
+        "SERVICE: " + SERVICE + "\\n" +
+        "LANGUAGE: " + language + "\\n" +
+        "TONE: " + tone + "\\n" +
+        "SERVICE DETAILS:\\n" + inputs.join("\\n") + "\\n" +
+        "ADDITIONAL REQUIREMENTS:\\n" + details;
+
+    try{{
+        const response=await fetch("/chat",{{
+            method:"POST",
+            headers:{{"Content-Type":"application/json"}},
+            body:JSON.stringify({{message:prompt}})
+        }});
+
+        const data=await response.json();
+        result.textContent=data.answer || data.error || "No response.";
+    }}catch(e){{
+        result.textContent="Something went wrong. Please try again.";
+    }}
+}}
+
+buildFields();
+</script>
 </body>
 </html>
 """
@@ -894,7 +1165,7 @@ YourAI
 </div>
 
 
-<button class="ask-top" onclick="focusAsk()">
+<button class="ask-top" onclick="openAIChat()">
 Ask AI
 </button>
 
@@ -910,32 +1181,6 @@ Ask AI anything or choose a service below.
 </p>
 
 
-<div class="ask-box">
-
-<div class="ask-row">
-
-<textarea
-id="prompt"
-placeholder="Ask anything..."
-onkeydown="keySend(event)"
-></textarea>
-
-
-<button class="send" onclick="askAI()">
-
-<svg viewBox="0 0 24 24">
-<path d="M4 12h15"/>
-<path d="M13 5l7 7-7 7"/>
-</svg>
-
-</button>
-
-</div>
-
-<div id="response" class="response"></div>
-
-</div>
-
 </section>
 
 
@@ -946,7 +1191,18 @@ onkeydown="keySend(event)"
 
 <div class="category">
 
-<h2>✍️ AI Content</h2>
+
+<div class="service-section">
+<h2>💬 AI Chat</h2>
+<div class="service-grid">
+<button class="service chat-service" onclick="openAIChat()">
+<div class="icon">💬</div>
+<strong>AI Chat</strong>
+<span>Ask anything, learn, explain, solve</span>
+</button>
+</div>
+</div>
+\n<h2>✍️ AI Content</h2>
 
 <div class="grid">
 
@@ -1392,6 +1648,60 @@ onkeydown="keySend(event)"
 </div>
 
 
+<!-- SHOPPING & PRICE -->
+
+<div class="category">
+
+<h2>🛒 Shopping & Price</h2>
+
+<div class="grid">
+
+<button class="service" onclick="choose('Product Search')">
+<div class="icon">🔎</div>
+<strong>Product Search</strong>
+<span>Find products and shopping options</span>
+</button>
+
+<button class="service" onclick="choose('Price Comparison')">
+<div class="icon">💰</div>
+<strong>Price Comparison</strong>
+<span>Compare prices across available sources</span>
+</button>
+
+<button class="service" onclick="choose('Best Deal Finder')">
+<div class="icon">🏷️</div>
+<strong>Best Deal Finder</strong>
+<span>Find the best-value option</span>
+</button>
+
+<button class="service" onclick="choose('Product Comparison')">
+<div class="icon">⚖</div>
+<strong>Product Comparison</strong>
+<span>Compare products, features and value</span>
+</button>
+
+<button class="service" onclick="choose('Product Review Summary')">
+<div class="icon">⭐</div>
+<strong>Product Review Summary</strong>
+<span>Summarize product reviews</span>
+</button>
+
+<button class="service" onclick="choose('Buyers Guide')">
+<div class="icon">🛍️</div>
+<strong>Buyer's Guide</strong>
+<span>Get help choosing a product</span>
+</button>
+
+<button class="service" onclick="choose('Product Link Finder')">
+<div class="icon">🔗</div>
+<strong>Product Link Finder</strong>
+<span>Find available shopping links</span>
+</button>
+
+</div>
+</div>
+
+
 <!-- CUSTOM -->
 
 <div class="category">
@@ -1438,21 +1748,17 @@ function focusAsk(){
 }
 
 
-function choose(service){
 
-    const input=document.getElementById("prompt");
-
-    input.value="Help me with " + service + ": ";
-
-    input.focus();
-
-    window.scrollTo({
-        top:0,
-        behavior:"smooth"
-    });
-
+function openAIChat(){
+    window.location.href="/chat-home";
 }
 
+function choose(service){
+
+    const encoded = encodeURIComponent(service);
+    window.location.href = "/service/" + encoded;
+
+}
 
 function keySend(e){
 
@@ -1594,6 +1900,27 @@ Do not claim to have performed live web research unless a web-search
 backend is actually connected.
 """,
 
+    "shopping": """
+You are an AI shopping research and comparison assistant.
+Help users search for products, compare products and prices, summarize reviews, and make buying decisions.
+
+IMPORTANT:
+- Never invent current prices.
+- Never invent discounts or offers.
+- Never invent product availability.
+- Never invent sellers or shopping links.
+- Never invent ratings or reviews.
+- Clearly say when live shopping data is unavailable.
+- Separate verified information from AI recommendations.
+- For comparisons, focus on specifications, features, price/value, pros and cons.
+- If the user provides product links or product information, analyze only the information actually available.
+
+If live product data is not connected, clearly say:
+"Live shopping data is not connected yet, so I can help with the comparison or buying analysis, but I cannot verify current prices or availability."
+
+Do not pretend that a product was searched online unless live shopping/search data is actually available.
+""",
+
     "automation": """
 You are an AI automation consultant.
 Design chatbots, customer-support bots, FAQ systems,
@@ -1612,6 +1939,101 @@ useful AI work directly whenever possible.
 }
 
 
+# =========================
+# SERVICE-SPECIFIC ROUTING
+# =========================
+
+SERVICE_CATEGORY_MAP = {
+    # Content
+    "Instagram Post": "content",
+    "Facebook Post": "content",
+    "WhatsApp Promotion": "content",
+    "Advertisement Copy": "content",
+    "Product Description": "content",
+    "YouTube Description": "content",
+    "Blog / Article": "content",
+    "SEO Content": "content",
+    "Email Writer": "content",
+
+    # Creative
+    "AI Image": "image",
+    "Image Enhancement": "image",
+    "Background Removal": "image",
+    "Logo & Brand Ideas": "image",
+    "Poster / Flyer": "image",
+    "Thumbnail": "image",
+
+    # Video / Audio
+    "AI Video": "video",
+    "Reel / Short Script": "video",
+    "AI Voice": "voice",
+    "Text to Speech": "voice",
+    "Subtitle Generator": "video",
+    "Audio Tools": "voice",
+
+    # Development
+    "Web App Builder": "development",
+    "Android App Builder": "development",
+    "Web Game Builder": "development",
+    "Android Game": "development",
+    "Plugin Builder": "development",
+    "API Builder": "development",
+    "Automation Tool": "development",
+    "Code Generator": "development",
+    "Bug Fix": "development",
+
+    # Automation
+    "AI Chatbot": "automation",
+    "Customer Support Bot": "automation",
+    "FAQ Bot": "automation",
+    "Email Automation": "automation",
+    "WhatsApp Automation": "automation",
+    "Lead Generator": "automation",
+    "Business Workflow": "automation",
+
+    # Documents
+    "Resume / CV": "documents",
+    "Cover Letter": "documents",
+    "PDF Summarizer": "documents",
+    "Notes Generator": "documents",
+    "Report Generator": "documents",
+    "Presentation / PPT": "documents",
+
+    # Business
+    "Business Ideas": "business",
+    "Business Plan": "business",
+    "Marketing Plan": "business",
+    "Market Research": "business",
+    "Brand Name Generator": "business",
+    "Slogan Generator": "business",
+    "Pricing Ideas": "business",
+    "Sales Copy": "business",
+
+    # Research / tools
+    "AI Research": "research",
+    "Summarizer": "research",
+    "Translator": "research",
+    "Grammar & Rewrite": "research",
+    "Keyword Generator": "research",
+    "Prompt Generator": "research",
+    "Prompt Optimizer": "research",
+    "JSON Generator": "research",
+
+    # Shopping & Price
+    "Product Search": "shopping",
+    "Price Comparison": "shopping",
+    "Best Deal Finder": "shopping",
+    "Product Comparison": "shopping",
+    "Product Review Summary": "shopping",
+    "Buyers Guide": "shopping",
+    "Product Link Finder": "shopping",
+
+    # Custom
+    "Custom AI Project": "development",
+    "Build My AI Tool": "development",
+}
+
+
 @app.get("/services")
 def services():
     return {
@@ -1626,6 +2048,7 @@ def services():
             "business": "active",
             "research": "active for AI-assisted research",
             "automation": "active for workflow generation",
+            "shopping": "AI comparison active / live shopping provider required",
             "general": "active"
         }
     }
@@ -1644,12 +2067,33 @@ async def chat(request: Request):
     if not prompt:
         return {"error": "Message is required"}
 
-    service = detect_service(prompt)
+    # Dedicated service page se SERVICE aaye to usko priority do.
+    # Normal AI Chat me SERVICE na ho to automatic detection chalega.
+    requested_service = None
+
+    for line in prompt.splitlines():
+        if line.strip().lower().startswith("service:"):
+            requested_service = line.split(":", 1)[1].strip()
+            break
+
+    service = SERVICE_CATEGORY_MAP.get(
+        requested_service,
+        detect_service(prompt)
+    )
 
     system_prompt = SERVICE_PROMPTS.get(
         service,
         SERVICE_PROMPTS["general"]
     )
+
+    # Service ko AI ke context me explicitly pass karo.
+    if requested_service:
+        system_prompt += f"""
+        
+The user selected this exact service: {requested_service}.
+Follow the selected service closely and produce the most useful final result.
+Do not switch to another service unless the user explicitly asks.
+"""
 
     # Services that currently need a dedicated external media/file provider.
     provider_required = {
