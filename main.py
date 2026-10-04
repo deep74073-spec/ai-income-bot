@@ -1526,54 +1526,188 @@ def home():
     return SERVICE_HOME
 
 
+# =========================
+# SMART AI SERVICE BACKEND
+# =========================
+
+SERVICE_PROMPTS = {
+    "content": """
+You are an expert AI content creator.
+Create ready-to-use content for Instagram, Facebook, WhatsApp,
+advertisements, product descriptions, YouTube descriptions,
+blogs, SEO content and emails.
+Do not give unnecessary explanations. Make the output usable immediately.
+""",
+
+    "image": """
+You are an AI creative assistant.
+Help with image prompts, poster prompts, thumbnail prompts,
+logo concepts, background-removal instructions and image-editing prompts.
+IMPORTANT: do not claim that an image was actually generated because
+an image-generation backend is not connected yet.
+Return a professional ready-to-use image prompt when appropriate.
+""",
+
+    "video": """
+You are an AI video-production assistant.
+Create video concepts, reels, shorts, scripts, scenes, hooks,
+storyboards, shot lists and captions.
+IMPORTANT: do not claim that a video was actually rendered.
+""",
+
+    "voice": """
+You are an AI voice and audio assistant.
+Create voiceover scripts, narration, TTS-ready text and audio plans.
+IMPORTANT: do not claim that an audio file was actually generated.
+""",
+
+    "development": """
+You are an expert software developer.
+Build useful working code for websites, web apps, Android apps,
+games, plugins, APIs, automation tools and bug fixes.
+When appropriate provide complete files and explain where each file goes.
+Never pretend that code was compiled, deployed or packaged unless that
+actually happened.
+""",
+
+    "documents": """
+You are an expert document assistant.
+Create resumes, CVs, cover letters, reports, notes, presentations,
+PPT outlines and document-ready content.
+If the user references a PDF/file that has not been provided,
+ask them to upload it rather than pretending you read it.
+""",
+
+    "business": """
+You are an AI business consultant.
+Help with business ideas, business plans, marketing plans,
+market research frameworks, brand names, slogans, pricing and sales copy.
+Give practical and realistic recommendations.
+Do not invent live market data.
+""",
+
+    "research": """
+You are an AI research and writing assistant.
+Help with summarization, translation, rewriting, grammar,
+SEO, keywords, prompts and research.
+Do not claim to have performed live web research unless a web-search
+backend is actually connected.
+""",
+
+    "automation": """
+You are an AI automation consultant.
+Design chatbots, customer-support bots, FAQ systems,
+lead-generation workflows, email automation, WhatsApp automation
+and business workflows.
+Provide practical workflow logic, API requirements and code when useful.
+Do not claim an external automation was executed unless connected.
+""",
+
+    "general": """
+You are the main AI assistant of an AI services platform.
+Understand the user's request and help directly.
+If the request belongs to one of the platform services, perform the
+useful AI work directly whenever possible.
+"""
+}
+
+
+@app.get("/services")
+def services():
+    return {
+        "status": "ok",
+        "services": {
+            "content": "active",
+            "image": "prompt-ready / image provider required",
+            "video": "script-ready / video provider required",
+            "voice": "script-ready / TTS provider required",
+            "development": "active",
+            "documents": "active for text / file backend required for PDF uploads",
+            "business": "active",
+            "research": "active for AI-assisted research",
+            "automation": "active for workflow generation",
+            "general": "active"
+        }
+    }
+
+
 @app.post("/chat")
 async def chat(request: Request):
 
-    data = await request.json()
+    try:
+        data = await request.json()
+    except Exception:
+        return {"error": "Invalid JSON request"}
 
     prompt = str(data.get("message", "")).strip()
 
     if not prompt:
         return {"error": "Message is required"}
 
-    response = client.chat.completions.create(
+    service = detect_service(prompt)
 
-        model="openai/gpt-oss-20b",
-
-        messages=[
-
-            {
-                "role":"system",
-                "content":"""
-You are the main AI assistant of an AI services platform.
-
-Understand the user's request and help directly.
-
-You can help with:
-content, images, video ideas, audio, coding,
-web apps, Android apps, games, plugins, automation,
-documents, business, research and general AI tasks.
-
-Do not claim that an external image/video/audio/file
-was actually generated unless the corresponding backend
-tool is connected.
-
-For coding requests, provide useful working code.
-For content requests, create ready-to-use content.
-For business requests, give practical answers.
-"""
-            },
-
-            {
-                "role":"user",
-                "content":prompt
-            }
-
-        ]
-
+    system_prompt = SERVICE_PROMPTS.get(
+        service,
+        SERVICE_PROMPTS["general"]
     )
 
-    return {
-        "answer":response.choices[0].message.content
+    # Services that currently need a dedicated external media/file provider.
+    provider_required = {
+        "image": "Image generation provider",
+        "video": "Video generation provider",
+        "voice": "Text-to-speech/audio provider"
     }
+
+    if service in provider_required:
+        provider = provider_required[service]
+
+        response = client.chat.completions.create(
+            model="openai/gpt-oss-20b",
+            messages=[
+                {
+                    "role": "system",
+                    "content": system_prompt
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ]
+        )
+
+        return {
+            "service": service,
+            "status": "ready",
+            "provider_status": "not_connected",
+            "answer": response.choices[0].message.content,
+            "note": f"{provider} is required for actual file generation."
+        }
+
+    try:
+        response = client.chat.completions.create(
+            model="openai/gpt-oss-20b",
+            messages=[
+                {
+                    "role": "system",
+                    "content": system_prompt
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ]
+        )
+
+        return {
+            "service": service,
+            "status": "active",
+            "answer": response.choices[0].message.content
+        }
+
+    except Exception as e:
+        return {
+            "service": service,
+            "status": "error",
+            "error": str(e)
+        }
 
