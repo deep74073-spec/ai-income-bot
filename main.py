@@ -27,618 +27,6 @@ def get_usage(request: Request):
     return ip
 
 
-@app.get("/", response_class=HTMLResponse)
-def home():
-    return """
-<!DOCTYPE html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ContentAI - AI Content Generator</title>
-
-<style>
-* { box-sizing: border-box; }
-
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f7f7fb;
-    color: #111;
-}
-
-.hero {
-    text-align: center;
-    padding: 60px 20px 40px;
-    background: white;
-}
-
-.hero h1 {
-    font-size: 42px;
-    margin: 0 0 15px;
-}
-
-.hero p {
-    color: #666;
-    font-size: 18px;
-    max-width: 600px;
-    margin: auto;
-}
-
-.btn {
-    display: inline-block;
-    margin-top: 25px;
-    padding: 14px 25px;
-    background: #111;
-    color: white;
-    text-decoration: none;
-    border-radius: 10px;
-    font-weight: bold;
-}
-
-.limit {
-    display: inline-block;
-    margin-top: 15px;
-    padding: 8px 14px;
-    background: #f0f0f0;
-    border-radius: 20px;
-    font-size: 14px;
-}
-
-.features {
-    max-width: 900px;
-    margin: auto;
-    padding: 40px 20px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
-}
-
-.card {
-    background: white;
-    padding: 25px;
-    border-radius: 15px;
-    text-align: center;
-    border: 1px solid #eee;
-}
-
-.icon {
-    width: 54px;
-    height: 54px;
-    margin: auto auto 15px;
-}
-
-.generator {
-    max-width: 700px;
-    margin: 20px auto 50px;
-    background: white;
-    padding: 25px;
-    border-radius: 15px;
-}
-
-input, textarea, select, button {
-    width: 100%;
-    padding: 12px;
-    margin: 8px 0 15px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-}
-
-textarea {
-    min-height: 100px;
-}
-
-button {
-    background: #111;
-    color: white;
-    border: 0;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-label {
-    font-weight: bold;
-}
-
-/* ===== PROFESSIONAL NAVIGATION ===== */
-.navbar {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    height: 70px;
-    background: rgba(255,255,255,.96);
-    border-bottom: 1px solid #e8e8ed;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 22px;
-    backdrop-filter: blur(12px);
-}
-
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 21px;
-    font-weight: 800;
-    text-decoration: none;
-    color: #111;
-}
-
-.brand-mark {
-    width: 38px;
-    height: 38px;
-    border-radius: 11px;
-    background: #111;
-    color: white;
-    display: grid;
-    place-items: center;
-}
-
-.menu-btn {
-    width: 44px;
-    height: 44px;
-    padding: 0;
-    margin: 0;
-    border: 1px solid #e5e5ea;
-    background: white;
-    color: #111;
-    border-radius: 11px;
-    display: grid;
-    place-items: center;
-    cursor: pointer;
-}
-
-.menu-btn:hover {
-    background: #f5f5f7;
-}
-
-.menu-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.28);
-    z-index: 1090;
-    opacity: 0;
-    visibility: hidden;
-    transition: .2s ease;
-}
-
-.menu-overlay.open {
-    opacity: 1;
-    visibility: visible;
-}
-
-.side-menu {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: min(370px, 88vw);
-    height: 100vh;
-    background: white;
-    z-index: 1100;
-    transform: translateX(100%);
-    transition: transform .25s ease;
-    box-shadow: -12px 0 35px rgba(0,0,0,.12);
-    overflow-y: auto;
-}
-
-.side-menu.open {
-    transform: translateX(0);
-}
-
-.menu-head {
-    height: 70px;
-    padding: 0 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid #eee;
-}
-
-.menu-title {
-    font-size: 18px;
-    font-weight: 800;
-}
-
-.close-btn {
-    width: 40px;
-    height: 40px;
-    border: 1px solid #eee;
-    background: #f7f7f8;
-    color: #111;
-    border-radius: 10px;
-    padding: 0;
-    margin: 0;
-    cursor: pointer;
-}
-
-.menu-section {
-    padding: 20px;
-}
-
-.menu-label {
-    font-size: 12px;
-    font-weight: 800;
-    color: #8a8a93;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    margin-bottom: 10px;
-}
-
-.menu-item {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 13px;
-    padding: 13px 12px;
-    margin: 3px 0;
-    color: #17171a;
-    text-decoration: none;
-    border-radius: 12px;
-    font-weight: 600;
-}
-
-.menu-item:hover {
-    background: #f5f5f7;
-}
-
-.menu-icon {
-    width: 38px;
-    height: 38px;
-    flex: 0 0 38px;
-    display: grid;
-    place-items: center;
-    border-radius: 10px;
-    background: #f3f3f5;
-}
-
-.menu-item.game {
-    background: #111;
-    color: white;
-    margin-top: 8px;
-}
-
-.menu-item.game:hover {
-    background: #222;
-}
-
-.menu-item.game .menu-icon {
-    background: #2d2d31;
-}
-
-.menu-sub {
-    margin-left: 51px;
-    border-left: 1px solid #e5e5e8;
-    padding-left: 12px;
-}
-
-.menu-sub a {
-    display: block;
-    padding: 9px 10px;
-    color: #666;
-    text-decoration: none;
-    font-size: 14px;
-    border-radius: 8px;
-}
-
-.menu-sub a:hover {
-    background: #f5f5f7;
-    color: #111;
-}
-
-@media (max-width: 600px) {
-    .navbar {
-        padding: 0 15px;
-    }
-
-    .brand {
-        font-size: 19px;
-    }
-
-    .hero {
-        padding-top: 45px;
-    }
-}
-
-</style>
-</head>
-
-<body>
-
-<nav class="navbar">
-
-<a class="brand" href="/">
-    <span class="brand-mark">
-        <svg width="21" height="21" viewBox="0 0 24 24" fill="none">
-            <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"
-                  fill="currentColor"/>
-            <path d="M19 16l.7 2.3L22 19l-2.3.7L19 22l-.7-2.3L16 19l2.3-.7L19 16z"
-                  fill="currentColor"/>
-        </svg>
-    </span>
-    ContentAI
-</a>
-
-<button class="menu-btn" onclick="openMenu()" aria-label="Open menu">
-    <svg width="23" height="23" viewBox="0 0 24 24" fill="none">
-        <path d="M4 6h16M4 12h16M4 18h16"
-              stroke="currentColor" stroke-width="2"
-              stroke-linecap="round"/>
-    </svg>
-</button>
-
-</nav>
-
-<div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
-
-<aside class="side-menu" id="sideMenu">
-
-    <div class="menu-head">
-        <div class="menu-title">Services</div>
-
-        <button class="close-btn" onclick="closeMenu()" aria-label="Close menu">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M6 6l12 12M18 6L6 18"
-                      stroke="currentColor" stroke-width="2"
-                      stroke-linecap="round"/>
-            </svg>
-        </button>
-    </div>
-
-    <div class="menu-section">
-
-        <div class="menu-label">AI Content</div>
-
-        <a class="menu-item" href="#generator" onclick="closeMenu()">
-            <span class="menu-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <rect x="3" y="3" width="18" height="18" rx="5"
-                          stroke="currentColor" stroke-width="1.8"/>
-                    <circle cx="12" cy="12" r="4"
-                            stroke="currentColor" stroke-width="1.8"/>
-                    <circle cx="17.5" cy="6.5" r="1"
-                            fill="currentColor"/>
-                </svg>
-            </span>
-            Instagram Content
-        </a>
-
-        <a class="menu-item" href="#generator" onclick="closeMenu()">
-            <span class="menu-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.7-1.2A9 9 0 1 0 12 3z"
-                          stroke="currentColor" stroke-width="1.8"/>
-                    <path d="M8.5 8.5c.4-.5.8-.5 1.1-.1l1 1.3c.2.3.2.6 0 .9l-.5.6c.8 1.4 1.8 2.3 3.2 3.1l.6-.5c.3-.2.6-.2.9 0l1.3 1c.4.3.4.7-.1 1.1-.6.6-1.5.8-2.3.5-2.8-.9-5.2-3.3-6.1-6.1-.3-.8-.1-1.7.5-2.3z"
-                          stroke="currentColor" stroke-width="1.3"/>
-                </svg>
-            </span>
-            WhatsApp Promotion
-        </a>
-
-        <a class="menu-item" href="#generator" onclick="closeMenu()">
-            <span class="menu-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M4 7h16v13H4z"
-                          stroke="currentColor" stroke-width="1.8"/>
-                    <path d="M8 7V5h8v2M8 12h8M8 16h5"
-                          stroke="currentColor" stroke-width="1.8"
-                          stroke-linecap="round"/>
-                </svg>
-            </span>
-            Product Description
-        </a>
-
-        <a class="menu-item" href="#generator" onclick="closeMenu()">
-            <span class="menu-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <path d="M4 20V10M10 20V4M16 20v-7M22 20H2"
-                          stroke="currentColor" stroke-width="1.8"
-                          stroke-linecap="round"/>
-                </svg>
-            </span>
-            Advertisement Copy
-        </a>
-
-        <a class="menu-item" href="#generator" onclick="closeMenu()">
-            <span class="menu-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <rect x="3" y="5" width="18" height="14" rx="3"
-                          stroke="currentColor" stroke-width="1.8"/>
-                    <path d="M10 9l5 3-5 3V9z" fill="currentColor"/>
-                </svg>
-            </span>
-            YouTube Description
-        </a>
-
-        <div class="menu-label" style="margin-top:24px;">AI Development</div>
-
-        <a class="menu-item game" href="#game-builder" onclick="closeMenu()">
-            <span class="menu-icon">
-                <svg width="21" height="21" viewBox="0 0 24 24" fill="none">
-                    <path d="M8 13l-2 4a2.5 2.5 0 0 0 4.3 2.4L12 17l1.7 2.4A2.5 2.5 0 0 0 18 17l-2-4"
-                          stroke="currentColor" stroke-width="1.8"
-                          stroke-linecap="round"/>
-                    <rect x="6" y="5" width="12" height="10" rx="5"
-                          stroke="currentColor" stroke-width="1.8"/>
-                    <path d="M9 10h3M10.5 8.5v3"
-                          stroke="currentColor" stroke-width="1.8"
-                          stroke-linecap="round"/>
-                    <circle cx="15.5" cy="9.5" r=".8" fill="currentColor"/>
-                </svg>
-            </span>
-            Game &amp; App Builder
-        </a>
-
-        <div class="menu-sub" id="game-builder">
-            <a href="#generator" onclick="closeMenu()">Web Game</a>
-            <a href="#generator" onclick="closeMenu()">Android App</a>
-            <a href="#generator" onclick="closeMenu()">Plugin</a>
-            <a href="#generator" onclick="closeMenu()">Custom AI Project</a>
-        </div>
-
-        <div class="menu-label" style="margin-top:24px;">More</div>
-
-        <a class="menu-item" href="#generator" onclick="closeMenu()">
-            <span class="menu-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="9"
-                            stroke="currentColor" stroke-width="1.8"/>
-                    <path d="M12 10v6M12 7.5v.2"
-                          stroke="currentColor" stroke-width="1.8"
-                          stroke-linecap="round"/>
-                </svg>
-            </span>
-            How It Works
-        </a>
-
-    </div>
-</aside>
-
-
-<section class="hero">
-
-<h1>ContentAI</h1>
-
-<p>
-Create social media posts, WhatsApp promotions and product descriptions with AI in seconds.
-</p>
-
-<a class="btn" href="#generator">Try Free</a>
-
-<div class="limit">3 free generations per day</div>
-
-</section>
-
-
-<section class="features">
-
-<div class="card">
-
-<div class="icon">
-<svg viewBox="0 0 24 24" width="54" height="54" aria-label="Instagram">
-<rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/>
-<circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/>
-<circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>
-</svg>
-</div>
-
-<h2>Instagram</h2>
-<p>Create ready-to-publish Instagram content.</p>
-
-</div>
-
-
-<div class="card">
-
-<div class="icon">
-<svg viewBox="0 0 24 24" width="54" height="54" aria-label="WhatsApp">
-<path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.7-1.2A9 9 0 1 0 12 3z"
-fill="none" stroke="currentColor" stroke-width="2"/>
-<path d="M8.5 8.5c.4-.5.8-.5 1.1-.1l1 1.3c.2.3.2.6 0 .9l-.5.6c.8 1.4 1.8 2.3 3.2 3.1l.6-.5c.3-.2.6-.2.9 0l1.3 1c.4.3.4.7-.1 1.1-.6.6-1.5.8-2.3.5-2.8-.9-5.2-3.3-6.1-6.1-.3-.8-.1-1.7.5-2.3z"
-fill="none" stroke="currentColor" stroke-width="1.5"/>
-</svg>
-</div>
-
-<h2>WhatsApp</h2>
-<p>Create promotional messages ready to share.</p>
-
-</div>
-
-
-<div class="card">
-
-<div class="icon">
-<svg viewBox="0 0 24 24" width="54" height="54" aria-label="Product">
-<path d="M4 7h16v13H4z" fill="none" stroke="currentColor" stroke-width="2"/>
-<path d="M8 7V5h8v2" fill="none" stroke="currentColor" stroke-width="2"/>
-<path d="M8 12h8M8 16h5" stroke="currentColor" stroke-width="2"/>
-</svg>
-</div>
-
-<h2>Product Copy</h2>
-<p>Generate clear product descriptions for your business.</p>
-
-</div>
-
-</section>
-
-
-<section class="generator" id="generator">
-
-<h2>🚀 Try ContentAI Free</h2>
-
-<form method="post" action="/generate">
-
-<label>Business / Brand</label>
-<input name="business" placeholder="Example: Sharma Bakery" required>
-
-<label>Topic / Offer</label>
-<textarea name="topic" placeholder="Example: Diwali special eggless cake offer" required></textarea>
-
-<label>Actual Product Details</label>
-<textarea name="details" placeholder="Example: Eggless cakes, starting price ₹499"></textarea>
-
-<label>Content Type</label>
-<select name="content_type">
-<option>Instagram Post</option>
-<option>Facebook Post</option>
-<option>WhatsApp Message</option>
-<option>Product Description</option>
-<option>Advertisement</option>
-<option>YouTube Description</option>
-</select>
-
-<label>Language</label>
-<select name="language">
-<option>English</option>
-<option>Hindi</option>
-<option>Hinglish</option>
-</select>
-
-<label>Tone</label>
-<select name="tone">
-<option>Professional</option>
-<option>Friendly</option>
-<option>Premium</option>
-<option>Fun</option>
-</select>
-
-<label>Content Length</label>
-<select name="length">
-<option>Short</option>
-<option selected>Normal</option>
-<option>Detailed</option>
-</select>
-
-<button type="submit">✨ Generate Content</button>
-
-</form>
-
-</section>
-
-
-<script>
-function openMenu() {
-    document.getElementById("sideMenu").classList.add("open");
-    document.getElementById("menuOverlay").classList.add("open");
-    document.body.style.overflow = "hidden";
-}
-
-function closeMenu() {
-    document.getElementById("sideMenu").classList.remove("open");
-    document.getElementById("menuOverlay").classList.remove("open");
-    document.body.style.overflow = "";
-}
-
-document.addEventListener("keydown", function(event) {
-    if (event.key === "Escape") {
-        closeMenu();
-    }
-});
-</script>
-
-</body>
-</html>
-"""
 
 
 @app.get("/health")
@@ -926,45 +314,6 @@ def detect_service(prompt: str) -> str:
     return "general"
 
 
-@app.post("/chat")
-async def chat(request: Request):
-    data = await request.json()
-    prompt = str(data.get("message", "")).strip()
-
-    if not prompt:
-        return {"error": "Message is required"}
-
-    service = detect_service(prompt)
-
-    system_prompt = f"""
-You are the main AI assistant of an AI services platform.
-
-Detected service category: {service}
-
-Your job:
-- Understand the user's request.
-- Give a useful direct answer.
-- If the request requires creation, provide the actual useful output.
-- Do not invent facts about a user's business, product, prices, phone numbers,
-  addresses, features, certifications or other real-world details.
-- Ask for missing information only when it is genuinely required.
-- For coding requests, provide practical working code.
-- For business/content requests, make the result ready to use.
-- Be concise but helpful.
-"""
-
-    response = client.chat.completions.create(
-        model="openai/gpt-oss-20b",
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": prompt}
-        ],
-    )
-
-    return {
-        "service": service,
-        "answer": response.choices[0].message.content
-    }
 
 
 
@@ -1253,3 +602,978 @@ async function sendMessage(){
 @app.get("/chat-home", response_class=HTMLResponse)
 def chat_home():
     return CHAT_HOME
+
+
+# =================================================
+# AI CHAT + COMPLETE SERVICE DASHBOARD
+# =================================================
+
+SERVICE_HOME = r"""
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>YourAI - AI Services</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    background:#f7f7fb;
+    color:#171717;
+    font-family:Arial,sans-serif;
+}
+
+.header{
+    position:sticky;
+    top:0;
+    z-index:50;
+    height:62px;
+    background:white;
+    border-bottom:1px solid #e8e8ed;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 18px;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    font-weight:700;
+    font-size:19px;
+}
+
+.brand-icon{
+    width:32px;
+    height:32px;
+    border-radius:9px;
+    background:#111;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.brand-icon svg{
+    width:18px;
+    height:18px;
+    stroke:white;
+    fill:none;
+    stroke-width:2;
+}
+
+.ask-top{
+    border:0;
+    background:#111;
+    color:white;
+    padding:10px 15px;
+    border-radius:10px;
+    font-size:14px;
+    font-weight:600;
+}
+
+.hero{
+    max-width:1050px;
+    margin:auto;
+    padding:34px 18px 20px;
+}
+
+.hero h1{
+    margin:0;
+    font-size:30px;
+}
+
+.hero p{
+    color:#777;
+    margin:9px 0 22px;
+}
+
+.ask-box{
+    background:white;
+    border:1px solid #e4e4e8;
+    border-radius:18px;
+    padding:12px;
+    box-shadow:0 4px 20px rgba(0,0,0,.04);
+}
+
+.ask-row{
+    display:flex;
+    gap:10px;
+    align-items:flex-end;
+}
+
+.ask-box textarea{
+    flex:1;
+    border:0;
+    outline:0;
+    resize:none;
+    min-height:48px;
+    max-height:130px;
+    font-size:16px;
+    padding:10px;
+    font-family:inherit;
+}
+
+.send{
+    width:42px;
+    height:42px;
+    border:0;
+    border-radius:50%;
+    background:#111;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.send svg{
+    width:18px;
+    height:18px;
+    stroke:white;
+    fill:none;
+    stroke-width:2;
+}
+
+.response{
+    display:none;
+    margin-top:15px;
+    background:#fafafa;
+    border:1px solid #e5e5e5;
+    border-radius:14px;
+    padding:15px;
+    white-space:pre-wrap;
+    line-height:1.6;
+}
+
+.services{
+    max-width:1050px;
+    margin:auto;
+    padding:5px 18px 50px;
+}
+
+.category{
+    margin:25px 0 12px;
+}
+
+.category h2{
+    font-size:17px;
+    margin:0 0 12px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+}
+
+.service{
+    background:white;
+    border:1px solid #e5e5e9;
+    border-radius:14px;
+    padding:16px 12px;
+    text-align:left;
+    cursor:pointer;
+    transition:.15s;
+}
+
+.service:hover{
+    transform:translateY(-2px);
+    border-color:#bbb;
+    box-shadow:0 5px 18px rgba(0,0,0,.06);
+}
+
+.icon{
+    width:38px;
+    height:38px;
+    border-radius:10px;
+    background:#f1f1f3;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-bottom:10px;
+}
+
+.icon svg{
+    width:21px;
+    height:21px;
+    stroke:#111;
+    fill:none;
+    stroke-width:1.8;
+}
+
+.service strong{
+    display:block;
+    font-size:14px;
+}
+
+.service span{
+    display:block;
+    color:#888;
+    font-size:11px;
+    margin-top:4px;
+}
+
+.badge{
+    display:inline-block;
+    margin-top:7px;
+    font-size:9px;
+    border-radius:5px;
+    padding:3px 6px;
+    background:#eee;
+    color:#555;
+}
+
+.footer{
+    text-align:center;
+    color:#999;
+    font-size:12px;
+    padding:30px;
+}
+
+@media(max-width:800px){
+
+    .grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .hero h1{
+        font-size:25px;
+    }
+
+}
+
+@media(max-width:430px){
+
+    .header{
+        padding:0 12px;
+    }
+
+    .grid{
+        grid-template-columns:repeat(2,1fr);
+        gap:8px;
+    }
+
+    .service{
+        padding:13px 10px;
+    }
+
+    .service strong{
+        font-size:13px;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+<header class="header">
+
+<div class="brand">
+
+<div class="brand-icon">
+
+<svg viewBox="0 0 24 24">
+<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>
+</svg>
+
+</div>
+
+YourAI
+
+</div>
+
+
+<button class="ask-top" onclick="focusAsk()">
+Ask AI
+</button>
+
+</header>
+
+
+<section class="hero">
+
+<h1>What can I help you create?</h1>
+
+<p>
+Ask AI anything or choose a service below.
+</p>
+
+
+<div class="ask-box">
+
+<div class="ask-row">
+
+<textarea
+id="prompt"
+placeholder="Ask anything..."
+onkeydown="keySend(event)"
+></textarea>
+
+
+<button class="send" onclick="askAI()">
+
+<svg viewBox="0 0 24 24">
+<path d="M4 12h15"/>
+<path d="M13 5l7 7-7 7"/>
+</svg>
+
+</button>
+
+</div>
+
+<div id="response" class="response"></div>
+
+</div>
+
+</section>
+
+
+<section class="services">
+
+
+<!-- CONTENT -->
+
+<div class="category">
+
+<h2>✍️ AI Content</h2>
+
+<div class="grid">
+
+<button class="service" onclick="choose('Instagram Post')">
+<div class="icon">✦</div>
+<strong>Instagram Post</strong>
+<span>Posts & captions</span>
+</button>
+
+<button class="service" onclick="choose('Facebook Post')">
+<div class="icon">F</div>
+<strong>Facebook Post</strong>
+<span>Social content</span>
+</button>
+
+<button class="service" onclick="choose('WhatsApp Promotion')">
+<div class="icon">W</div>
+<strong>WhatsApp</strong>
+<span>Promotional messages</span>
+</button>
+
+<button class="service" onclick="choose('Advertisement Copy')">
+<div class="icon">↗</div>
+<strong>Advertisement</strong>
+<span>Ad copy & ideas</span>
+</button>
+
+<button class="service" onclick="choose('Product Description')">
+<div class="icon">□</div>
+<strong>Product Description</strong>
+<span>Product copy</span>
+</button>
+
+<button class="service" onclick="choose('YouTube Description')">
+<div class="icon">▶</div>
+<strong>YouTube</strong>
+<span>Video descriptions</span>
+</button>
+
+<button class="service" onclick="choose('Blog / Article')">
+<div class="icon">≡</div>
+<strong>Blog / Article</strong>
+<span>Long-form writing</span>
+</button>
+
+<button class="service" onclick="choose('SEO Content')">
+<div class="icon">⌕</div>
+<strong>SEO Content</strong>
+<span>Search content</span>
+</button>
+
+<button class="service" onclick="choose('Email Writer')">
+<div class="icon">@</div>
+<strong>Email Writer</strong>
+<span>Professional emails</span>
+</button>
+
+</div>
+</div>
+
+
+<!-- CREATIVE -->
+
+<div class="category">
+
+<h2>🎨 AI Creative</h2>
+
+<div class="grid">
+
+<button class="service" onclick="choose('AI Image')">
+<div class="icon">◇</div>
+<strong>AI Image</strong>
+<span>Image generation</span>
+</button>
+
+<button class="service" onclick="choose('Image Enhancement')">
+<div class="icon">↗</div>
+<strong>Image Enhancement</strong>
+<span>Improve images</span>
+</button>
+
+<button class="service" onclick="choose('Background Removal')">
+<div class="icon">□</div>
+<strong>Background Removal</strong>
+<span>Remove background</span>
+</button>
+
+<button class="service" onclick="choose('Logo & Brand Ideas')">
+<div class="icon">◎</div>
+<strong>Logo & Brand</strong>
+<span>Brand concepts</span>
+</button>
+
+<button class="service" onclick="choose('Poster / Flyer')">
+<div class="icon">▣</div>
+<strong>Poster / Flyer</strong>
+<span>Marketing designs</span>
+</button>
+
+<button class="service" onclick="choose('Thumbnail')">
+<div class="icon">▤</div>
+<strong>Thumbnail</strong>
+<span>Video thumbnails</span>
+</button>
+
+</div>
+</div>
+
+
+<!-- VIDEO AUDIO -->
+
+<div class="category">
+
+<h2>🎬 AI Video & Audio</h2>
+
+<div class="grid">
+
+<button class="service" onclick="choose('AI Video')">
+<div class="icon">▶</div>
+<strong>AI Video</strong>
+<span>Video creation</span>
+</button>
+
+<button class="service" onclick="choose('Reel / Short Script')">
+<div class="icon">▷</div>
+<strong>Reel / Short Script</strong>
+<span>Short-form scripts</span>
+</button>
+
+<button class="service" onclick="choose('AI Voice')">
+<div class="icon">)))</div>
+<strong>AI Voice</strong>
+<span>Voice generation</span>
+</button>
+
+<button class="service" onclick="choose('Text to Speech')">
+<div class="icon">T</div>
+<strong>Text to Speech</strong>
+<span>Speech generation</span>
+</button>
+
+<button class="service" onclick="choose('Subtitle Generator')">
+<div class="icon">≡</div>
+<strong>Subtitles</strong>
+<span>Generate captions</span>
+</button>
+
+<button class="service" onclick="choose('Audio Tools')">
+<div class="icon">♪</div>
+<strong>Audio Tools</strong>
+<span>Audio workflows</span>
+</button>
+
+</div>
+</div>
+
+
+<!-- DEVELOPMENT -->
+
+<div class="category">
+
+<h2>💻 AI Development</h2>
+
+<div class="grid">
+
+<button class="service" onclick="choose('Web App Builder')">
+<div class="icon">&lt;/&gt;</div>
+<strong>Web App Builder</strong>
+<span>Build web apps</span>
+</button>
+
+<button class="service" onclick="choose('Android App Builder')">
+<div class="icon">□</div>
+<strong>Android App</strong>
+<span>Build Android apps</span>
+</button>
+
+<button class="service" onclick="choose('Web Game Builder')">
+<div class="icon">◆</div>
+<strong>Web Game</strong>
+<span>Build browser games</span>
+</button>
+
+<button class="service" onclick="choose('Android Game')">
+<div class="icon">◇</div>
+<strong>Android Game</strong>
+<span>Game development</span>
+</button>
+
+<button class="service" onclick="choose('Plugin Builder')">
+<div class="icon">⊞</div>
+<strong>Plugin Builder</strong>
+<span>Build plugins</span>
+</button>
+
+<button class="service" onclick="choose('API Builder')">
+<div class="icon">⇄</div>
+<strong>API Builder</strong>
+<span>Build APIs</span>
+</button>
+
+<button class="service" onclick="choose('Automation Tool')">
+<div class="icon">⚙</div>
+<strong>Automation Tool</strong>
+<span>Automate tasks</span>
+</button>
+
+<button class="service" onclick="choose('Code Generator')">
+<div class="icon">&lt;/&gt;</div>
+<strong>Code Generator</strong>
+<span>Generate code</span>
+</button>
+
+<button class="service" onclick="choose('Bug Fix')">
+<div class="icon">!</div>
+<strong>Bug Fix</strong>
+<span>Debug code</span>
+</button>
+
+</div>
+</div>
+
+
+<!-- AUTOMATION -->
+
+<div class="category">
+
+<h2>⚙️ AI Automation</h2>
+
+<div class="grid">
+
+<button class="service" onclick="choose('AI Chatbot')">
+<div class="icon">◇</div>
+<strong>AI Chatbot</strong>
+<span>Build chatbots</span>
+</button>
+
+<button class="service" onclick="choose('Customer Support Bot')">
+<div class="icon">?</div>
+<strong>Customer Support</strong>
+<span>Support automation</span>
+</button>
+
+<button class="service" onclick="choose('FAQ Bot')">
+<div class="icon">?</div>
+<strong>FAQ Bot</strong>
+<span>Answer FAQs</span>
+</button>
+
+<button class="service" onclick="choose('Email Automation')">
+<div class="icon">@</div>
+<strong>Email Automation</strong>
+<span>Automate email</span>
+</button>
+
+<button class="service" onclick="choose('WhatsApp Automation')">
+<div class="icon">W</div>
+<strong>WhatsApp Automation</strong>
+<span>Automate WhatsApp</span>
+</button>
+
+<button class="service" onclick="choose('Lead Generator')">
+<div class="icon">◎</div>
+<strong>Lead Generator</strong>
+<span>Generate leads</span>
+</button>
+
+<button class="service" onclick="choose('Business Workflow')">
+<div class="icon">↻</div>
+<strong>Business Workflow</strong>
+<span>Automate workflows</span>
+</button>
+
+</div>
+</div>
+
+
+<!-- DOCUMENTS -->
+
+<div class="category">
+
+<h2>📄 AI Documents</h2>
+
+<div class="grid">
+
+<button class="service" onclick="choose('Resume / CV')">
+<div class="icon">▤</div>
+<strong>Resume / CV</strong>
+<span>Create resumes</span>
+</button>
+
+<button class="service" onclick="choose('Cover Letter')">
+<div class="icon">✉</div>
+<strong>Cover Letter</strong>
+<span>Job applications</span>
+</button>
+
+<button class="service" onclick="choose('PDF Summarizer')">
+<div class="icon">▤</div>
+<strong>PDF Summarizer</strong>
+<span>Summarize documents</span>
+</button>
+
+<button class="service" onclick="choose('Notes Generator')">
+<div class="icon">≡</div>
+<strong>Notes Generator</strong>
+<span>Create notes</span>
+</button>
+
+<button class="service" onclick="choose('Report Generator')">
+<div class="icon">▥</div>
+<strong>Report Generator</strong>
+<span>Generate reports</span>
+</button>
+
+<button class="service" onclick="choose('Presentation / PPT')">
+<div class="icon">▣</div>
+<strong>Presentation / PPT</strong>
+<span>Create presentations</span>
+</button>
+
+</div>
+</div>
+
+
+<!-- BUSINESS -->
+
+<div class="category">
+
+<h2>💼 AI Business</h2>
+
+<div class="grid">
+
+<button class="service" onclick="choose('Business Ideas')">
+<div class="icon">✦</div>
+<strong>Business Ideas</strong>
+<span>Find opportunities</span>
+</button>
+
+<button class="service" onclick="choose('Business Plan')">
+<div class="icon">▥</div>
+<strong>Business Plan</strong>
+<span>Plan your business</span>
+</button>
+
+<button class="service" onclick="choose('Marketing Plan')">
+<div class="icon">↗</div>
+<strong>Marketing Plan</strong>
+<span>Marketing strategy</span>
+</button>
+
+<button class="service" onclick="choose('Market Research')">
+<div class="icon">⌕</div>
+<strong>Market Research</strong>
+<span>Research markets</span>
+</button>
+
+<button class="service" onclick="choose('Brand Name Generator')">
+<div class="icon">A</div>
+<strong>Brand Names</strong>
+<span>Generate names</span>
+</button>
+
+<button class="service" onclick="choose('Slogan Generator')">
+<div class="icon">✦</div>
+<strong>Slogan Generator</strong>
+<span>Create slogans</span>
+</button>
+
+<button class="service" onclick="choose('Pricing Ideas')">
+<div class="icon">₹</div>
+<strong>Pricing Ideas</strong>
+<span>Pricing strategy</span>
+</button>
+
+<button class="service" onclick="choose('Sales Copy')">
+<div class="icon">↗</div>
+<strong>Sales Copy</strong>
+<span>Sales messaging</span>
+</button>
+
+</div>
+</div>
+
+
+<!-- RESEARCH -->
+
+<div class="category">
+
+<h2>🔎 AI Research & Tools</h2>
+
+<div class="grid">
+
+<button class="service" onclick="choose('AI Research')">
+<div class="icon">⌕</div>
+<strong>AI Research</strong>
+<span>Research assistant</span>
+</button>
+
+<button class="service" onclick="choose('Summarizer')">
+<div class="icon">≡</div>
+<strong>Summarizer</strong>
+<span>Summarize text</span>
+</button>
+
+<button class="service" onclick="choose('Translator')">
+<div class="icon">A</div>
+<strong>Translator</strong>
+<span>Translate languages</span>
+</button>
+
+<button class="service" onclick="choose('Grammar & Rewrite')">
+<div class="icon">✓</div>
+<strong>Grammar & Rewrite</strong>
+<span>Improve writing</span>
+</button>
+
+<button class="service" onclick="choose('Keyword Generator')">
+<div class="icon">#</div>
+<strong>Keyword Generator</strong>
+<span>Find keywords</span>
+</button>
+
+<button class="service" onclick="choose('Prompt Generator')">
+<div class="icon">✦</div>
+<strong>Prompt Generator</strong>
+<span>Create prompts</span>
+</button>
+
+<button class="service" onclick="choose('Prompt Optimizer')">
+<div class="icon">⚡</div>
+<strong>Prompt Optimizer</strong>
+<span>Improve prompts</span>
+</button>
+
+<button class="service" onclick="choose('JSON Generator')">
+<div class="icon">{ }</div>
+<strong>JSON Generator</strong>
+<span>Create JSON</span>
+</button>
+
+</div>
+</div>
+
+
+<!-- CUSTOM -->
+
+<div class="category">
+
+<h2>🚀 Custom AI</h2>
+
+<div class="grid">
+
+<button class="service" onclick="choose('Custom AI Project')">
+<div class="icon">✦</div>
+<strong>Custom AI Project</strong>
+<span>Build your idea</span>
+</button>
+
+<button class="service" onclick="choose('Build My AI Tool')">
+<div class="icon">⚙</div>
+<strong>Build My AI Tool</strong>
+<span>Custom AI solution</span>
+</button>
+
+</div>
+</div>
+
+
+</section>
+
+
+<div class="footer">
+YourAI • AI tools & services
+</div>
+
+
+<script>
+
+function focusAsk(){
+
+    document.getElementById("prompt").focus();
+
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
+
+}
+
+
+function choose(service){
+
+    const input=document.getElementById("prompt");
+
+    input.value="Help me with " + service + ": ";
+
+    input.focus();
+
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
+
+}
+
+
+function keySend(e){
+
+    if(e.key==="Enter" && !e.shiftKey){
+
+        e.preventDefault();
+
+        askAI();
+
+    }
+
+}
+
+
+async function askAI(){
+
+    const input=document.getElementById("prompt");
+
+    const response=document.getElementById("response");
+
+    const text=input.value.trim();
+
+    if(!text) return;
+
+    response.style.display="block";
+
+    response.textContent="Thinking...";
+
+    try{
+
+        const r=await fetch("/chat",{
+
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+                message:text
+            })
+
+        });
+
+        const data=await r.json();
+
+        response.textContent =
+            data.answer ||
+            data.error ||
+            "No response.";
+
+    }catch(e){
+
+        response.textContent=
+            "Unable to connect to AI.";
+
+    }
+
+}
+
+</script>
+
+
+</body>
+</html>
+"""
+
+
+@app.get("/", response_class=HTMLResponse)
+def home():
+    return SERVICE_HOME
+
+
+@app.post("/chat")
+async def chat(request: Request):
+
+    data = await request.json()
+
+    prompt = str(data.get("message", "")).strip()
+
+    if not prompt:
+        return {"error": "Message is required"}
+
+    response = client.chat.completions.create(
+
+        model="openai/gpt-oss-20b",
+
+        messages=[
+
+            {
+                "role":"system",
+                "content":"""
+You are the main AI assistant of an AI services platform.
+
+Understand the user's request and help directly.
+
+You can help with:
+content, images, video ideas, audio, coding,
+web apps, Android apps, games, plugins, automation,
+documents, business, research and general AI tasks.
+
+Do not claim that an external image/video/audio/file
+was actually generated unless the corresponding backend
+tool is connected.
+
+For coding requests, provide useful working code.
+For content requests, create ready-to-use content.
+For business requests, give practical answers.
+"""
+            },
+
+            {
+                "role":"user",
+                "content":prompt
+            }
+
+        ]
+
+    )
+
+    return {
+        "answer":response.choices[0].message.content
+    }
+
